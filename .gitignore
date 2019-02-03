@@ -44,6 +44,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+.pytest_cache/
 
 # Translations
 *.mo
@@ -69,3 +70,6 @@ target/
 # Vim
 *.swp
 *.*~
+
+# Pycharm
+.idea/

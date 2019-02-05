@@ -23,10 +23,18 @@ def computeFajr(thuhr, angle, latitude, declination, horizonEquation):
     return fajr
 
 
-# def computeThuhr(LNG, LAT, EQT, TZ):
-#     t = 12 + TZ - (LNG/15 + EQT)
-#     thuhr = dt.datetime(2019, 2, 4) + dt.timedelta(hours=t)
-#     return thuhr
+def computeThuhr(longitude, timeZone, equationOfTime):
+    """
+    Calculates the time of Thuhr prayer.
+
+    :param longitude: Number, the longitude of the point of interest in degrees.
+    :param timeZone: Number, the timezone of the point of interest in degrees.
+    :param equationOfTime: Number, mean minus apparent solar time in minutes.
+    :return:
+    """
+    t = 12 + timeZone - (longitude/15 + equationOfTime)
+    thuhr = dt.datetime(2019, 2, 4) + dt.timedelta(hours=t)
+    return thuhr
 
 
 def computeJulianDay(year, month, day):

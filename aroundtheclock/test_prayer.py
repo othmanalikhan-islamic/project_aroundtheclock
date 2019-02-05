@@ -37,15 +37,14 @@ class TestPrayerModule(unittest.TestCase):
         prayer = prayertimes.computeFajr(thuhr, ANG, LAT, DEC, prayertimes.horizonEquation)
         self.assertAlmostEqualPrayer(fajr, prayer, 3)
 
-    # def testComputeThuhr(self):
-    #     TZ = 3
-    #     LON = 50.2083
-    #     LAT = 26.2172
-    #     DEC, EQT = prayertimes.computeSun(2019, 2, 4)
-    #     thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-    #
-    #     prayer = prayertimes.computeThuhr(LON, LAT, EQT, TZ)
-    #     self.assertAlmostEqualPrayer(prayer, thuhr, 0)
+    def testComputeThuhr(self):
+        TZ = 3
+        LON = 50.2083
+        DEC, EQT = prayertimes.computeSun(2019, 2, 4)
+        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
+
+        prayer = prayertimes.computeThuhr(LON, TZ, EQT)
+        self.assertAlmostEqualPrayer(prayer, thuhr, 3)
 
     def assertAlmostEqualPrayer(self, p1, p2, err):
         """

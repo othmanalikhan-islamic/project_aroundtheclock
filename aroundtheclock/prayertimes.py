@@ -8,30 +8,35 @@ from math import acos, asin, atan2, cos, degrees, radians, sin
 import julian
 
 
-def computeFajr(thuhr, angle, LAT, DEC, T):
+def computeFajr(thuhr, angle, latitude, declination, horizonEquation):
     """
-    :param thuhr: datetime, the time for thuhr.
-    :param angle:
-    :return: datetime, the time for fajr.
-    """
-    print(T(angle, LAT, DEC))
-    # return dt(2019, 1, 1)
+    Calculates the time of Fajr prayer.
 
-    t = T(angle, LAT, DEC)
-    hours, minutes = divmod(t*60, 60)
-    print(hours, minutes)
-    fajr = thuhr - dt(2019, 1, 1, int(hours), int(minutes))
+    :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
+    :param angle: Number, the angle convention used to calculated Fajr.
+    :param latitude: Number, the latitude of the point of interest in degrees.
+    :param declination: Number, the declination of the sun in degrees.
+    :param horizonEquation: Function, computes time to reach an angle below the horizon.
+    :return: datetime.datetime, the datetime of Fajr.
+    """
+    fajr = thuhr - horizonEquation(angle, latitude, declination)
     return fajr
+
+
+# def computeThuhr(LNG, LAT, EQT, TZ):
+#     t = 12 + TZ - (LNG/15 + EQT)
+#     thuhr = dt.datetime(2019, 2, 4) + dt.timedelta(hours=t)
+#     return thuhr
 
 
 def computeJulianDay(year, month, day):
     """
     Converts a Gregorian date to a Julian date.
 
-    :param year: Integer, the year.
-    :param month: Integer, the month.
-    :param day: Integer, the day.
-    :return: Number, the corresponding julian date.
+    :param year: Integer, the Gregorian year.
+    :param month: Integer, the Gregorian month.
+    :param day: Integer, the Gregorian day.
+    :return: Number, the corresponding Julian date.
     """
     return julian.to_jd(dt.datetime(year, month, day))
 
@@ -41,7 +46,7 @@ def computeSun(year, month, day):
     Calculates the declination of the sun and the equation of time which are
     needed in prayer calculations.
 
-    Equations:
+    Definitions:
         Equation of Time = Apparent Solar Time - Mean Solar Time
         Declination = The angle between the sun's rays and Earth's equator.
 
@@ -53,9 +58,9 @@ def computeSun(year, month, day):
         e - Mean obliquity of the ecliptic
         RA - Right ascension
 
-    :param year: Integer, the year.
-    :param month: Integer, the month.
-    :param day: Integer, the day.
+    :param year: Integer, the year to compute the sun parameters.
+    :param month: Integer, the month to compute the sun parameters.
+    :param day: Integer, the day to compute the sun parameters.
     :return: 2-Tuple, (declination, equation of time)
     """
     d = computeJulianDay(year, month, day) - 2451545.0
@@ -72,18 +77,25 @@ def computeSun(year, month, day):
     return declination, equationOfTime
 
 
-def T(angle, latitude, declination):
+def horizonEquation(angle, latitude, declination):
     """
-    The equation that computes the time taken for the sun to reach a given
-    angle below the horizon.
+    The equation that computes the time taken for the sun to reach from the
+    highest point in the sky (~thuhr) to a given angle below the horizon.
 
-    :param angle: Number, the angle in degrees.
-    :param latitude: Number, the latitude in degrees.
-    :param declination: Number, the latitude in degrees.
+    In some literature, this equation is also denoted as just 'T'.
+
+    :param angle: Number, the angle the sun should reach below the horizon in degrees.
+    :param latitude: Number, the latitude of the point of interest in degrees.
+    :param declination: Number, the declination of the sun in degrees.
     :return: datetime.timedelta, the time taken for the sun to reach the angle.
     """
     a = radians(angle)
     LAT = radians(latitude)
     DEC = radians(declination)
-    t = 1/15 * degrees(acos((-sin(a) - sin(LAT)*sin(DEC)) / (cos(LAT)*cos(DEC))))
-    return dt.timedelta(hours=t)
+
+    top = -sin(a) - sin(LAT)*sin(DEC)
+    bot = cos(LAT)*cos(DEC)
+    q = top/bot
+    h = 1/15 * degrees(acos(q))
+    h = 1/15 * degrees(acos((-sin(a) - sin(LAT)*sin(DEC)) / (cos(LAT)*cos(DEC))))
+    return dt.timedelta(hours=h)

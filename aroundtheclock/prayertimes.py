@@ -83,6 +83,17 @@ def computeMaghrib(year, month, day, angle, latitude, thuhr, horizonEquation, su
     return fajr
 
 
+def computeIshaUmmAlQura(maghrib):
+    """
+    Calculates the time of Isha prayer.
+
+    :param maghrib: datetime.datetime, the time of Maghrib prayer.
+    :return: datetime.datetime, the time of Thuhr prayer.
+    """
+    isha = maghrib + dt.timedelta(minutes=90)
+    return isha
+
+
 def computeJulianDay(year, month, day):
     """
     Converts a Gregorian date to a Julian date.

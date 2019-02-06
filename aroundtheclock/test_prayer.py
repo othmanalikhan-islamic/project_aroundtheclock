@@ -9,25 +9,25 @@ class TestPrayerModule(unittest.TestCase):
     def setUp(self):
         self.FORMAT = "%Y-%m-%d %H:%M"
 
-    def testComputeJulianDay_standardDate_convertedDateToFloat(self):
+    def testComputeJulianDay_standardDate_calculateCorrectly(self):
         JD = 2458517.5
         self.assertEqual(JD, prayertimes.computeJulianDay(2019, 2, 3))
 
-    def testComputeSun_standardValue_returnCalculatedValue(self):
+    def testSunEquation_standardValue_calculateCorrectly(self):
         declination = -23.03993184124207
         equationOfTime = -0.053431595269049836
         DEC, EOT = prayertimes._sunEquation(2019, 1, 1)
         self.assertEqual(DEC, declination, msg="Declination calculations failed!")
         self.assertEqual(EOT, equationOfTime, msg="EoT calculations failed!")
 
-    def testT_standardValue_returnCalculatedValue(self):
+    def testHorizonEquation_standardValue_calculateCorrectly(self):
         calculated = dt.timedelta(seconds=33298, microseconds=699809)
         ANG = 50.5
         LAT = 26.2172
         DEC = -16.3741
         self.assertEqual(calculated, prayertimes._horizonEquation(ANG, LAT, DEC))
 
-    def testComputeFajr_khobarParams_returnKhobarFajr(self):
+    def testComputeFajr_khobarCity_calculateKhobarFajr(self):
         fajr = dt.datetime.strptime("2019-02-04 05:01", self.FORMAT)
 
         ANG = 18.5
@@ -39,7 +39,7 @@ class TestPrayerModule(unittest.TestCase):
                                          prayertimes._sunEquation)
         self.assertAlmostEqualPrayer(prayer, fajr, 3)
 
-    def testComputeThuhr_khobarParams_returnKhobarThuhr(self):
+    def testComputeThuhr_khobarCity_calculateKhobarThuhr(self):
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
 
         TZ = 3
@@ -48,7 +48,7 @@ class TestPrayerModule(unittest.TestCase):
         prayer = prayertimes.computeThuhr(year, month, day, LON, TZ, prayertimes._sunEquation)
         self.assertAlmostEqualPrayer(prayer, thuhr, 3)
 
-    def testComputeAsr_khobarParams_returnKhobarAsr(self):
+    def testComputeAsr_khobarCity_calculateKhobarAsr(self):
         asr = dt.datetime.strptime("2019-02-04 15:02", self.FORMAT)
 
         LAT = 26.2172
@@ -60,7 +60,7 @@ class TestPrayerModule(unittest.TestCase):
                                         prayertimes._sunEquation)
         self.assertAlmostEqualPrayer(prayer, asr, 3)
 
-    def testComputeMaghrib_khobarParams_returnKhobarMaghrib(self):
+    def testComputeMaghrib_khobarCity_calculateKhobarMaghrib(self):
         maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
 
         ANG = 0.833
@@ -71,6 +71,13 @@ class TestPrayerModule(unittest.TestCase):
                                             prayertimes._horizonEquation,
                                             prayertimes._sunEquation)
         self.assertAlmostEqualPrayer(prayer, maghrib, 3)
+
+    def testComputeIshaUmmAlQura_khobarCity_return90MinuteFromMaghrib(self):
+        isha = dt.datetime.strptime("2019-02-04 18:56", self.FORMAT)
+
+        maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
+        prayer = prayertimes.computeIshaUmmAlQura(maghrib)
+        self.assertAlmostEqualPrayer(prayer, isha, 0)   # No error acceptable
 
     def assertAlmostEqualPrayer(self, p1, p2, err):
         """

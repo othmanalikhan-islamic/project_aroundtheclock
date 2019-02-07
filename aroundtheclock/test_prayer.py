@@ -27,6 +27,14 @@ class TestPrayerModule(unittest.TestCase):
         DEC = -16.3741
         self.assertEqual(calculated, prayertimes._horizonEquation(ANG, LAT, DEC))
 
+    def testAsrEquation_standardValue_calculateCorrectly(self):
+        calculated = dt.timedelta(seconds=14061, microseconds=155471)
+        SHA = 2
+        LAT = 26.2172
+        DEC = -16.3741
+
+        self.assertEqual(calculated, prayertimes._asrEquation(SHA, LAT, DEC))
+
     def testComputeFajr_khobarCity_calculateKhobarFajr(self):
         fajr = dt.datetime.strptime("2019-02-04 05:01", self.FORMAT)
 
@@ -78,6 +86,18 @@ class TestPrayerModule(unittest.TestCase):
         maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
         prayer = prayertimes.computeIshaUmmAlQura(maghrib)
         self.assertAlmostEqualPrayer(prayer, isha, 0)   # No error acceptable
+
+    def testComputeIsha_khobarCity_calculateKhobarIsha(self):
+        isha = dt.datetime.strptime("2019-02-04 18:29", self.FORMAT)
+
+        ANG = 15.0
+        LAT = 26.2172
+        year, month, day = 2019, 2, 4
+        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
+        prayer = prayertimes.computeIsha(year, month, day, ANG, LAT, thuhr,
+                                         prayertimes._horizonEquation,
+                                         prayertimes._sunEquation)
+        self.assertAlmostEqualPrayer(prayer, isha, 3)
 
     def assertAlmostEqualPrayer(self, p1, p2, err):
         """

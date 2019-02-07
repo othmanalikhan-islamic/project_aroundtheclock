@@ -94,6 +94,25 @@ def computeIshaUmmAlQura(maghrib):
     return isha
 
 
+def computeIsha(year, month, day, angle, latitude, thuhr, horizonEquation, sunEquation):
+    """
+    Calculates the time of Isha prayer.
+
+    :param year: Integer, the Gregorian year.
+    :param month: Integer, the Gregorian month.
+    :param day: Integer, the Gregorian day.
+    :param angle: Number, the angle convention used to calculated Isha.
+    :param latitude: Number, the latitude of the point of interest in degrees.
+    :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
+    :param horizonEquation: Function, computes time to reach an angle below the horizon.
+    :param sunEquation: Function, computes declination and equation of time of the sun.
+    :return: datetime.datetime, the datetime of Isha.
+    """
+    declination, _ = sunEquation(year, month, day)
+    fajr = thuhr + horizonEquation(angle, latitude, declination)
+    return fajr
+
+
 def computeJulianDay(year, month, day):
     """
     Converts a Gregorian date to a Julian date.

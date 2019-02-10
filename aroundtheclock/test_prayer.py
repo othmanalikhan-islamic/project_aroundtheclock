@@ -14,12 +14,14 @@ class UnitTestPrayerModule(unittest.TestCase):
 
     def testJulianEquation_standardDate_calculateCorrectly(self):
         JD = 2458517.5
-        self.assertEqual(JD, prayertimes._julianEquation(2019, 2, 3))
+        date = dt.datetime(2019, 2, 3)
+        self.assertEqual(JD, prayertimes._julianEquation(date))
 
     def testSunEquation_standardValue_calculateCorrectly(self):
+        date = dt.datetime(2019, 1, 1)
         declination = -23.03993184124207
         equationOfTime = -0.053431595269049836
-        DEC, EOT = prayertimes._sunEquation(2019, 1, 1)
+        DEC, EOT = prayertimes._sunEquation(date)
         self.assertEqual(DEC, declination, msg="Declination calculations failed!")
         self.assertEqual(EOT, equationOfTime, msg="EoT calculations failed!")
 
@@ -51,9 +53,9 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
         ANG = 18.5
         LAT = 26.2172
-        year, month, day = 2019, 2, 4
+        date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayertimes.computeFajr(year, month, day, ANG, LAT, thuhr)
+        prayer = prayertimes.computeFajr(date, ANG, LAT, thuhr)
         self.assertAlmostEqualPrayer(prayer, fajr, 3)
 
     def testComputeThuhr_khobarCity_calculateKhobarThuhr(self):
@@ -61,8 +63,8 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
         TZ = 3
         LON = 50.2083
-        year, month, day = 2019, 2, 4
-        prayer = prayertimes.computeThuhr(year, month, day, LON, TZ)
+        date = dt.datetime(2019, 2, 4)
+        prayer = prayertimes.computeThuhr(date, LON, TZ)
         self.assertAlmostEqualPrayer(prayer, thuhr, 3)
 
     def testComputeAsr_khobarCity_calculateKhobarAsr(self):
@@ -70,9 +72,9 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
         LAT = 26.2172
         shadowLength = 1
-        year, month, day = 2019, 2, 4
+        date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayertimes.computeAsr(year, month, day, shadowLength, LAT, thuhr)
+        prayer = prayertimes.computeAsr(date, shadowLength, LAT, thuhr)
         self.assertAlmostEqualPrayer(prayer, asr, 3)
 
     def testComputeMaghrib_khobarCity_calculateKhobarMaghrib(self):
@@ -80,9 +82,9 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
         ANG = 0.833
         LAT = 26.2172
-        year, month, day = 2019, 2, 4
+        date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayertimes.computeMaghrib(year, month, day, LAT, thuhr, angle=ANG)
+        prayer = prayertimes.computeMaghrib(date, LAT, thuhr, angle=ANG)
         self.assertAlmostEqualPrayer(prayer, maghrib, 3)
 
     def testComputeIshaUmmAlQura_khobarCity_return90MinuteFromMaghrib(self):
@@ -97,9 +99,9 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
         ANG = 15.0
         LAT = 26.2172
-        year, month, day = 2019, 2, 4
+        date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayertimes.computeIsha(year, month, day, ANG, LAT, thuhr)
+        prayer = prayertimes.computeIsha(date, ANG, LAT, thuhr)
         self.assertAlmostEqualPrayer(prayer, isha, 3)
 
     def testComputeAllPrayerTimes_khobarCityJan_calculatePrecisely(self):
@@ -109,16 +111,16 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         maghrib = dt.datetime.strptime("2019-01-27 17:19", self.FORMAT)
         isha = dt.datetime.strptime("2019-01-27 18:49", self.FORMAT)
 
-        year, month, day = 2019, 1, 27
-        # longitude, latitude = 50.2083, 26.2172
-        longitude, latitude = 50.2025, 25.3676
+        date = dt.datetime(2019, 1, 27)
+        coordinates = (50.2025, 25.3676)
+
         timezone = 3
         fajrIshaConvention = "umm_alqura"
         asrConvention = "standard"
 
         p1, p2, p3, p4, p5 = \
-            prayertimes.computeAllPrayerTimes(year, month, day,
-                                              longitude, latitude,
+            prayertimes.computeAllPrayerTimes(date,
+                                              coordinates,
                                               timezone,
                                               fajrIshaConvention,
                                               asrConvention)
@@ -136,15 +138,15 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         maghrib = dt.datetime.strptime("2019-02-07 17:28", self.FORMAT)
         isha = dt.datetime.strptime("2019-02-07 18:58", self.FORMAT)
 
-        year, month, day = 2019, 2, 7
-        longitude, latitude = 50.2025, 25.3676
+        date = dt.datetime(2019, 2, 7)
+        coordinates = (50.2025, 25.3676)
         timezone = 3
         fajrIshaConvention = "umm_alqura"
         asrConvention = "standard"
 
         p1, p2, p3, p4, p5 = \
-            prayertimes.computeAllPrayerTimes(year, month, day,
-                                              longitude, latitude,
+            prayertimes.computeAllPrayerTimes(date,
+                                              coordinates,
                                               timezone,
                                               fajrIshaConvention,
                                               asrConvention)
@@ -165,7 +167,7 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         :param err: Integer, the number of minutes the prayer can deviate.
         :return: Boolean, true if test succeeds otherwise false.
         """
-        hours, minutes, seconds = prayertimes.computeError(p1, p2)
+        hours, minutes, seconds = prayertimes.computeDiff(p1, p2)
         if abs(60*hours + minutes + seconds/60) > err:
             self.fail("Prayer time differs by {:02d}:{:02d}:{:02d}!\np1: {}\np2: {}"
                       .format(hours, minutes, seconds, p1, p2))

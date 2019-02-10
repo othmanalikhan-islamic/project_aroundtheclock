@@ -28,24 +28,19 @@ implementation for more details.
 import datetime as dt
 import random
 from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
-from pprint import pprint
 
 import julian
 
 
-def computeAllPrayerTimes(year, month, day,
-                          longitude, latitude,
-                          timezone,
-                          fajrIshaConvention,
-                          asrConvention):
+################################################# PUBLIC FUNCTIONS
+
+
+def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrConvention):
     """
     Calculates the prayer time for all prayers for a given day.
 
-    :param year: Integer, the year to compute the sun parameters.
-    :param month: Integer, the month to compute the sun parameters.
-    :param day: Integer, the day to compute the sun parameters.
-    :param longitude: Number, the longitude of the point of interest in degrees.
-    :param latitude: Number, the latitude of the point of interest in degrees.
+    :param date: datetime.datetime, representing the Gregorian date.
+    :param coordinates: 2-Tuple, (longitude, latitude) of the point of interest in degrees.
     :param timezone: Number, the timezone of the point of interest in hours.
     :param fajrIshaConvention: String, the angle convention (see dictionary below).
     :param asrConvention: String, the shadow length multiplier (see dictionary below).
@@ -64,105 +59,94 @@ def computeAllPrayerTimes(year, month, day,
     }
 
     TZ = timezone
-    LON = longitude
-    LAT = latitude
+    LON, LAT = coordinates
     F_ANG, I_ANG = fajrIshaAngle[fajrIshaConvention]
     shadowLength = asrShadow[asrConvention]
 
-    thuhr = computeThuhr(year, month, day, LON, TZ)
-    fajr = computeFajr(year, month, day, F_ANG, LAT, thuhr)
-    asr = computeAsr(year, month, day, shadowLength, LAT, thuhr)
-    maghrib = computeMaghrib(year, month, day, LAT, thuhr)
+    thuhr = computeThuhr(date, LON, TZ)
+    fajr = computeFajr(date, F_ANG, LAT, thuhr)
+    asr = computeAsr(date, shadowLength, LAT, thuhr)
+    maghrib = computeMaghrib(date, LAT, thuhr)
 
     if I_ANG == "90min":
         isha = computeIshaUmmAlQura(maghrib)
     else:
-        isha = computeIsha(year, month, day, I_ANG, LAT, thuhr)
+        isha = computeIsha(date,  I_ANG, LAT, thuhr)
 
     return [fajr, thuhr, asr, maghrib, isha]
 
 
-def computeFajr(year, month, day, angle, latitude, thuhr):
+def computeFajr(date, angle, latitude, thuhr):
     """
     Calculates the time of Fajr prayer.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :param angle: Number, the angle convention used to calculated Fajr.
     :param latitude: Number, the latitude of the point of interest in degrees.
     :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
     :return: datetime.datetime, the datetime of Fajr.
     """
-    declination, _ = _sunEquation(year, month, day)
+    declination, _ = _sunEquation(date)
     fajr = thuhr - _horizonEquation(angle, latitude, declination)
     return fajr
 
 
-def computeThuhr(year, month, day, longitude, timeZone):
+def computeThuhr(date, longitude, timeZone):
     """
     Calculates the time of Thuhr prayer.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :param longitude: Number, the longitude of the point of interest in degrees.
     :param timeZone: Number, the timezone of the point of interest in degrees.
     :return: datetime.datetime, the time of Thuhr prayer.
     """
-    _, equationOfTime = _sunEquation(year, month, day)
+    _, equationOfTime = _sunEquation(date)
     t = 12 + timeZone - (longitude/15 + equationOfTime)
-    thuhr = dt.datetime(year, month, day) + dt.timedelta(hours=t)
+    thuhr = date + dt.timedelta(hours=t)
     return thuhr
 
 
-def computeAsr(year, month, day, shadowLength, latitude, thuhr):
+def computeAsr(date, shadowLength, latitude, thuhr):
     """
     Calculates the time of Asr prayer.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :param shadowLength: Number, the multiplier for the length of an object's shadow.
     :param latitude: Number, the latitude of the point of interest in degrees.
     :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
     :return: datetime.datetime, the time of Asr prayer.
     """
-    declination, _ = _sunEquation(year, month, day)
+    declination, _ = _sunEquation(date)
     asr = thuhr + _asrEquation(shadowLength, latitude, declination)
     return asr
 
 
-def computeMaghrib(year, month, day, latitude, thuhr, angle=0.833):
+def computeMaghrib(date, latitude, thuhr, angle=0.833):
     """
     Calculates the time of Maghrib prayer.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :param angle: Number, the angle convention used to calculated Maghrib.
     :param latitude: Number, the latitude of the point of interest in degrees.
     :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
     :return: datetime.datetime, the datetime of Maghrib.
     """
-    declination, _ = _sunEquation(year, month, day)
+    declination, _ = _sunEquation(date)
     fajr = thuhr + _horizonEquation(angle, latitude, declination)
     return fajr
 
 
-def computeIsha(year, month, day, angle, latitude, thuhr):
+def computeIsha(date, angle, latitude, thuhr):
     """
     Calculates the time of Isha prayer.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :param angle: Number, the angle convention used to calculated Isha.
     :param latitude: Number, the latitude of the point of interest in degrees.
     :param thuhr: datetime.datetime, Thuhr prayer on the SAME day.
     :return: datetime.datetime, the datetime of Isha.
     """
-    declination, _ = _sunEquation(year, month, day)
+    declination, _ = _sunEquation(date)
     fajr = thuhr + _horizonEquation(angle, latitude, declination)
     return fajr
 
@@ -178,19 +162,20 @@ def computeIshaUmmAlQura(maghrib):
     return isha
 
 
-def _julianEquation(year, month, day):
+################################################# PRIVATE FUNCTIONS
+
+
+def _julianEquation(date):
     """
     Converts a Gregorian date to a Julian date.
 
-    :param year: Integer, the Gregorian year.
-    :param month: Integer, the Gregorian month.
-    :param day: Integer, the Gregorian day.
+    :param date: datetime.datetime, representing the Gregorian date.
     :return: Number, the corresponding Julian date.
     """
-    return julian.to_jd(dt.datetime(year, month, day))
+    return julian.to_jd(date)
 
 
-def _sunEquation(year, month, day):
+def _sunEquation(date):
     """
     Calculates the declination of the sun and the equation of time which are
     needed in prayer calculations.
@@ -207,12 +192,10 @@ def _sunEquation(year, month, day):
         e - Mean obliquity of the ecliptic
         RA - Right ascension
 
-    :param year: Integer, the year to compute the sun parameters.
-    :param month: Integer, the month to compute the sun parameters.
-    :param day: Integer, the day to compute the sun parameters.
+    :param date: datetime.datetime, computing sun parameters for this date.
     :return: 2-Tuple, (declination, equation of time)
     """
-    d = _julianEquation(year, month, day) - 2451545.0
+    d = _julianEquation(date) - 2451545.0
 
     g = radians((357.529 + 0.98560028 * d) % 360)
     q = radians((280.459 + 0.98564736 * d) % 360)
@@ -268,7 +251,13 @@ def _asrEquation(shadowLength, latitude, declination):
     return dt.timedelta(hours=h)
 
 
-def computeError(prayers, latitudeRange, longitudeRange):
+################################################# NUMERICAL FUNCTIONS
+
+
+def guessCoordinates(prayers,
+                     longitudeRange, latitudeRange,
+                     date, timezone, fajrIshaConvention, asrConvention,
+                     guesses=10000):
     """
     This function brute forces numerically the actual latitude and longitude
     coordinates for the given prayer times.
@@ -278,14 +267,34 @@ def computeError(prayers, latitudeRange, longitudeRange):
     finds the error between these prayer times and the actual prayer times.
 
     :param prayers: 5-List, [fajr, thuhr, asr, maghrib, isha].
-    :param latitudeRange: 2-List, [startLatGuess, endLatGuess].
     :param longitudeRange: 2-List, [startLonGuess, endLonGuess].
+    :param latitudeRange: 2-List, [startLatGuess, endLatGuess].
+    :param date: datetime.datetime, representing the Gregorian date.
+    :param timezone: Number, the timezone of the point of interest in hours.
+    :param fajrIshaConvention: String, the angle convention (see dictionary below).
+    :param asrConvention: String, the shadow length multiplier (see dictionary below).
+    :param guesses: Number, the amount of iterations to try.
     :return: 3-Tuple, (lowestCumulativeErrorInMinutes, guessLat, guessLon).
     """
-    pass
+    points = {}
+
+    for i in range(guesses):
+        longitude = random.uniform(*longitudeRange)
+        latitude = random.uniform(*latitudeRange)
+        coord = (longitude, latitude)
+
+        ps = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
+
+        errorFunction = lambda hour, min, sec: 60*hour + min + sec/60
+        err = [errorFunction(*computeDiff(p1, p2)) for p1, p2 in zip(prayers, ps)]
+        err = sum(err)
+        points[err] = (longitude, latitude)
+
+    err, (longitude, latitude) = sorted(points.items(), reverse=True).pop()
+    return longitude, latitude, err
 
 
-def computeError(p1, p2):
+def computeDiff(p1, p2):
     """
     Calculates the difference between two prayers in minutes.
 
@@ -307,49 +316,43 @@ def computeError(p1, p2):
     return hours, minutes, seconds
 
 
+################################################# RUNNING SCRIPT
+
+
 def main():
-    t = dt.datetime.today()
-    year, month, day = t.year, t.month, t.day
-    year, month, day = 2019, 1, 27
-    longitude, latitude = 49.8000, 26.5172
+    t = dt.date.today()
+    date = dt.datetime(t.year, t.month, t.day)
+    coord = longitude, latitude = 50.2025, 25.3676
     timezone = 3
     fajrIshaConvention = "umm_alqura"
     asrConvention = "standard"
 
+    prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
 
+    # Printing prayer times
     FORMAT = "%Y-%m-%d %H:%M"
-    fajr = dt.datetime.strptime("2019-01-27 05:03", FORMAT)
-    thuhr = dt.datetime.strptime("2019-01-27 11:53", FORMAT)
-    asr = dt.datetime.strptime("2019-01-27 14:57", FORMAT)
-    maghrib = dt.datetime.strptime("2019-01-27 17:19", FORMAT)
-    isha = dt.datetime.strptime("2019-01-27 18:49", FORMAT)
-    prayers = [fajr, thuhr, asr, maghrib, isha]
+    prefix = ["Fajr", "Thuhr", "Asr", "Maghrib", "Isha"]
+    for name, p in zip(prefix, prayers):
+        print("{:<8}: {}".format(name, p.strftime(FORMAT)))
 
-
-
-    points = {}
-
-    for i in range(10000):
-        longitude = random.uniform(49, 51)
-        latitude = random.uniform(25, 27)
-
-        ps = computeAllPrayerTimes(year, month, day,
-                                        longitude, latitude,
-                                        timezone,
-                                        fajrIshaConvention,
-                                        asrConvention)
-
-        err = 0
-        for i in range(5):
-            hours, minutes, seconds = computeError(prayers[i], ps[i])
-            err += 60*hours + minutes + seconds/60
-
-        points[err] = (longitude, latitude)
-
-    for p, (lon, lat) in sorted(points.items()):
-        print("({}, {}) -> {}".format(lon, lat, p))
-
-    pprint(prayers)
+    # Numerical Analysis on Longitude and Latitude coordinates
+    # FORMAT = "%Y-%m-%d %H:%M"
+    # date = dt.datetime(2019, 1, 27)
+    # fajr = dt.datetime.strptime("2019-01-27 05:03", FORMAT)
+    # thuhr = dt.datetime.strptime("2019-01-27 11:53", FORMAT)
+    # asr = dt.datetime.strptime("2019-01-27 14:57", FORMAT)
+    # maghrib = dt.datetime.strptime("2019-01-27 17:19", FORMAT)
+    # isha = dt.datetime.strptime("2019-01-27 18:49", FORMAT)
+    # prayers = [fajr, thuhr, asr, maghrib, isha]
+    #
+    # longitudeRange = [longitude-2, longitude+2]
+    # latitudeRange = [latitude-2, latitude+2]
+    #
+    # longitude, latitude, err = \
+    #     guessCoordinates(prayers,
+    #                      longitudeRange, latitudeRange,
+    #                      date, timezone, fajrIshaConvention, asrConvention)
+    # print(longitude, latitude, err)
 
 
 if __name__ == "__main__":

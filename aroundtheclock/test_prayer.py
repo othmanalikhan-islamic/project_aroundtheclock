@@ -47,6 +47,8 @@ class IntegrationTestPrayerModule(unittest.TestCase):
 
     def setUp(self):
         self.FORMAT = "%Y-%m-%d %H:%M"
+        self.coordinates = (50.1000, 25.4000)
+        self.timezone = 3
 
     def testComputeFajr_khobarCity_calculateKhobarFajr(self):
         fajr = dt.datetime.strptime("2019-02-04 05:01", self.FORMAT)
@@ -104,7 +106,7 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         prayer = prayertimes.computeIsha(date, ANG, LAT, thuhr)
         self.assertAlmostEqualPrayer(prayer, isha, 3)
 
-    def testComputeAllPrayerTimes_khobarCityJan_calculatePrecisely(self):
+    def testComputeAllPrayerTimes_khobarCity20190127_calculatePrecisely(self):
         fajr = dt.datetime.strptime("2019-01-27 05:05", self.FORMAT)
         thuhr = dt.datetime.strptime("2019-01-27 11:53", self.FORMAT)
         asr = dt.datetime.strptime("2019-01-27 14:58", self.FORMAT)
@@ -112,16 +114,13 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         isha = dt.datetime.strptime("2019-01-27 18:49", self.FORMAT)
 
         date = dt.datetime(2019, 1, 27)
-        coordinates = (50.2025, 25.3676)
-
-        timezone = 3
         fajrIshaConvention = "umm_alqura"
         asrConvention = "standard"
 
         p1, p2, p3, p4, p5 = \
             prayertimes.computeAllPrayerTimes(date,
-                                              coordinates,
-                                              timezone,
+                                              self.coordinates,
+                                              self.timezone,
                                               fajrIshaConvention,
                                               asrConvention)
 
@@ -131,7 +130,7 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         self.assertAlmostEqualPrayer(p4, maghrib, 1)
         self.assertAlmostEqualPrayer(p5, isha, 1)
 
-    def testComputeAllPrayerTimes_khobarCityFeb_calculatePrecisely(self):
+    def testComputeAllPrayerTimes_khobarCity20190207_calculatePrecisely(self):
         fajr = dt.datetime.strptime("2019-02-07 05:00", self.FORMAT)
         thuhr = dt.datetime.strptime("2019-02-07 11:54", self.FORMAT)
         asr = dt.datetime.strptime("2019-02-07 15:05", self.FORMAT)
@@ -139,15 +138,37 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         isha = dt.datetime.strptime("2019-02-07 18:58", self.FORMAT)
 
         date = dt.datetime(2019, 2, 7)
-        coordinates = (50.2025, 25.3676)
-        timezone = 3
         fajrIshaConvention = "umm_alqura"
         asrConvention = "standard"
 
         p1, p2, p3, p4, p5 = \
             prayertimes.computeAllPrayerTimes(date,
-                                              coordinates,
-                                              timezone,
+                                              self.coordinates,
+                                              self.timezone,
+                                              fajrIshaConvention,
+                                              asrConvention)
+
+        self.assertAlmostEqualPrayer(p1, fajr, 1)
+        self.assertAlmostEqualPrayer(p2, thuhr, 1)
+        self.assertAlmostEqualPrayer(p3, asr, 2)
+        self.assertAlmostEqualPrayer(p4, maghrib, 2)
+        self.assertAlmostEqualPrayer(p5, isha, 2)
+
+    def testComputeAllPrayerTimes_khobarCity20190210_calculatePrecisely(self):
+        fajr = dt.datetime.strptime("2019-02-10 04:59", self.FORMAT)
+        thuhr = dt.datetime.strptime("2019-02-10 11:53", self.FORMAT)
+        asr = dt.datetime.strptime("2019-02-10 15:06", self.FORMAT)
+        maghrib = dt.datetime.strptime("2019-02-10 17:29", self.FORMAT)
+        isha = dt.datetime.strptime("2019-02-10 18:59", self.FORMAT)
+
+        date = dt.datetime(2019, 2, 10)
+        fajrIshaConvention = "umm_alqura"
+        asrConvention = "standard"
+
+        p1, p2, p3, p4, p5 = \
+            prayertimes.computeAllPrayerTimes(date,
+                                              self.coordinates,
+                                              self.timezone,
                                               fajrIshaConvention,
                                               asrConvention)
 

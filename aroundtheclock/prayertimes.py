@@ -34,6 +34,21 @@ import julian
 
 ################################################# PUBLIC FUNCTIONS
 
+def computeCronTime(prayer, blockTime):
+    """
+    Calculates Cron timings for a particular prayer.
+
+        startTime = prayer - blockTime/2
+        endTime   = prayer + blockTime/2
+
+    :param prayer: datetime.datetime, the prayer to generate Cron timings for.
+    :param blockTime: Number, the duration of the blocked time in minutes.
+    :return: 2-Tuple, (startTime, endTime) as datetime.datetime objects.
+    """
+    startTime = prayer - dt.timedelta(minutes=blockTime/2)
+    endTime = prayer + dt.timedelta(minutes=blockTime/2)
+    return startTime, endTime
+
 
 def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrConvention):
     """
@@ -178,7 +193,8 @@ def _julianEquation(date):
 def _sunEquation(date):
     """
     Calculates the declination of the sun and the equation of time which are
-    needed in prayer calculations.
+    needed in prayer calculations. The equations below are approximations of
+    the real values however with an error of 1 arc minute at worst in 2200.
 
     Definitions:
         Equation of Time = Apparent Solar Time - Mean Solar Time
@@ -322,7 +338,7 @@ def computeDiff(p1, p2):
 def main():
     t = dt.date.today()
     date = dt.datetime(t.year, t.month, t.day)
-    coord = longitude, latitude = 50.2025, 25.3676
+    coord = longitude, latitude = 50.0000, 26.6000
     timezone = 3
     fajrIshaConvention = "umm_alqura"
     asrConvention = "standard"
@@ -334,6 +350,7 @@ def main():
     prefix = ["Fajr", "Thuhr", "Asr", "Maghrib", "Isha"]
     for name, p in zip(prefix, prayers):
         print("{:<8}: {}".format(name, p.strftime(FORMAT)))
+
 
     # Numerical Analysis on Longitude and Latitude coordinates
     # FORMAT = "%Y-%m-%d %H:%M"

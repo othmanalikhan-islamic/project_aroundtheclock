@@ -28,6 +28,7 @@ implementation for more details.
 import datetime as dt
 import random
 from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
+from pathlib import Path
 
 import julian
 
@@ -342,14 +343,26 @@ def main():
     timezone = 3
     fajrIshaConvention = "umm_alqura"
     asrConvention = "standard"
+    PATH_OUT = Path("cron.txt")
 
     prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
 
-    # Printing prayer times
-    FORMAT = "%Y-%m-%d %H:%M"
+    print("Prayer Times:")
+    PRINT_FORMAT = "%Y-%m-%d %H:%M"
     prefix = ["Fajr", "Thuhr", "Asr", "Maghrib", "Isha"]
     for name, p in zip(prefix, prayers):
-        print("{:<8}: {}".format(name, p.strftime(FORMAT)))
+        print("{:<8}: {}".format(name, p.strftime(PRINT_FORMAT)))
+
+    print("\nCron Times:")
+    CRON_FORMAT = "%H:%M"
+    with open(PATH_OUT, "w") as f:
+        for p in prayers:
+            startTime, endTime = computeCronTime(p, 10)
+            startTime = startTime.strftime(CRON_FORMAT)
+            endTime = endTime.strftime(CRON_FORMAT)
+            line = "{},{}\n".format(startTime, endTime)
+            f.write(line)
+            print(line, end="")
 
 
     # Numerical Analysis on Longitude and Latitude coordinates

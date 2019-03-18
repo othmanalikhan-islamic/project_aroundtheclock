@@ -26,7 +26,9 @@ implementation for more details.
 """
 
 import datetime as dt
+import json
 import random
+from collections import OrderedDict
 from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 from pathlib import Path
 
@@ -35,7 +37,57 @@ import julian
 
 ################################################# PUBLIC FUNCTIONS
 
-def computeCronTime(prayer, blockTime):
+
+def writePrayerTimes(prayers, PATH_OUT):
+    """
+    Writes the prayer times for each prayer into a file in JSON format.
+
+    :param prayers: OrderedDictionary, mapping prayer names to prayer times (datetime objects).
+    :param PATH_OUT: Path, the output file to write to.
+    """
+    DATETIME_FORMAT = "%H:%M"
+
+    prayers = [(p, t.strftime(DATETIME_FORMAT)) for p, t in prayers.items()]
+    prayers = OrderedDict(prayers)
+    with open(PATH_OUT, 'w') as f:
+        json.dump(prayers, f, indent=4)
+
+
+def writeCronTimes(cronTimes, PATH_OUT):
+    """
+    Writes the Cron times for each prayer into a file.
+
+    The purpose thereafter is to use this file with Cron in Linux to schedule
+    a task to pause the local internet between the Cron times for each prayer.
+
+    :param cronTimes: List, containing (startTime, endTime) for each prayer.
+    :param PATH_OUT: Path, the output file to write to.
+    """
+    CRON_FORMAT = "%H:%M"
+    print("\nCron Times:")
+    with open(PATH_OUT, "w") as f:
+        for startTime, endTime in cronTimes:
+            startTime = startTime.strftime(CRON_FORMAT)
+            endTime = endTime.strftime(CRON_FORMAT)
+            line = "{},{}\n".format(startTime, endTime)
+            f.write(line)
+            print(line, end="")
+
+
+def printAllPrayerTimes(prayers):
+    """
+    Prints the prayer times in a neat table.
+
+    :param prayers: OrderedDictionary, mapping prayer names to prayer times
+    (datetime objects).
+    """
+    print("Prayer Times:")
+    PRINT_FORMAT = "%Y-%m-%d %H:%M"
+    for prayer, time in prayers.items():
+        print("{:<8}: {}".format(prayer, time.strftime(PRINT_FORMAT)))
+
+
+def _computePrayerCronTiming(prayer, blockTime):
     """
     Calculates Cron timings for a particular prayer.
 
@@ -60,8 +112,10 @@ def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrCo
     :param timezone: Number, the timezone of the point of interest in hours.
     :param fajrIshaConvention: String, the angle convention (see dictionary below).
     :param asrConvention: String, the shadow length multiplier (see dictionary below).
-    :return: 5-List, [fajr, thuhr, asr, maghrib, isha] as datetime objects.
+    :return: OrderedDictionary, mapping prayer names to prayer times (datetime objects).
     """
+    PRAYER_NAMES = ["fajr", "thuhr", "asr", "maghrib", "isha"]
+
     fajrIshaAngle = {
         "muslim_league": (18, 17),
         "isna": (15, 15),
@@ -89,7 +143,7 @@ def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrCo
     else:
         isha = computeIsha(date,  I_ANG, LAT, thuhr)
 
-    return [fajr, thuhr, asr, maghrib, isha]
+    return OrderedDict(zip(PRAYER_NAMES, [fajr, thuhr, asr, maghrib, isha]))
 
 
 def computeFajr(date, angle, latitude, thuhr):
@@ -343,27 +397,15 @@ def main():
     timezone = 3
     fajrIshaConvention = "umm_alqura"
     asrConvention = "standard"
-    PATH_OUT = Path("cron.txt")
+    PATH_CRON = Path("cron.txt")
+    PATH_JSON = Path("prayer.json")
 
     prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
+    printAllPrayerTimes(prayers)
 
-    print("Prayer Times:")
-    PRINT_FORMAT = "%Y-%m-%d %H:%M"
-    prefix = ["Fajr", "Thuhr", "Asr", "Maghrib", "Isha"]
-    for name, p in zip(prefix, prayers):
-        print("{:<8}: {}".format(name, p.strftime(PRINT_FORMAT)))
-
-    print("\nCron Times:")
-    CRON_FORMAT = "%H:%M"
-    with open(PATH_OUT, "w") as f:
-        for p in prayers:
-            startTime, endTime = computeCronTime(p, 10)
-            startTime = startTime.strftime(CRON_FORMAT)
-            endTime = endTime.strftime(CRON_FORMAT)
-            line = "{},{}\n".format(startTime, endTime)
-            f.write(line)
-            print(line, end="")
-
+    cronTimes = [_computePrayerCronTiming(t, 10) for p, t in prayers.items()]
+    writeCronTimes(cronTimes, PATH_CRON)
+    writePrayerTimes(prayers, PATH_JSON)
 
     # Numerical Analysis on Longitude and Latitude coordinates
     # FORMAT = "%Y-%m-%d %H:%M"

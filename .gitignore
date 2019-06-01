@@ -73,3 +73,6 @@ target/
 
 # Pycharm
 .idea/
+
+# Output
+output/

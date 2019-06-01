@@ -355,6 +355,7 @@ def guessCoordinates(prayers,
         coord = (longitude, latitude)
 
         ps = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
+        ps = [prayer for name, prayer in ps.items()]
 
         errorFunction = lambda hour, min, sec: 60*hour + min + sec/60
         err = [errorFunction(*computeDiff(p1, p2)) for p1, p2 in zip(prayers, ps)]
@@ -416,10 +417,10 @@ def main():
     # maghrib = dt.datetime.strptime("2019-01-27 17:19", FORMAT)
     # isha = dt.datetime.strptime("2019-01-27 18:49", FORMAT)
     # prayers = [fajr, thuhr, asr, maghrib, isha]
-    #
+
     # longitudeRange = [longitude-2, longitude+2]
     # latitudeRange = [latitude-2, latitude+2]
-    #
+
     # longitude, latitude, err = \
     #     guessCoordinates(prayers,
     #                      longitudeRange, latitudeRange,

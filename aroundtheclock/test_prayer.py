@@ -39,15 +39,6 @@ class UnitTestPrayerModule(unittest.TestCase):
         DEC = -16.3741
         self.assertEqual(calculated, prayertimes._asrEquation(SHA, LAT, DEC))
 
-    def testComputePrayerCronTiming_standardValue_calculateCorrectly(self):
-        fajr = dt.datetime.strptime("2019-08-10 03:42", self.FORMAT)
-        cronStart = dt.datetime.strptime("2019-08-10 03:37", self.FORMAT)
-        cronFinish = dt.datetime.strptime("2019-08-10 03:47", self.FORMAT)
-
-        start, finish = prayertimes._computePrayerCronTiming(fajr, 10)
-        self.assertEqual(cronStart, start)
-        self.assertEqual(cronFinish, finish)
-
 
 ######################################## INTEGRATION TESTS
 
@@ -195,7 +186,6 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         self.assertAlmostEqualPrayer(prayers["asr"], asr, err)
         self.assertAlmostEqualPrayer(prayers["maghrib"], maghrib, err)
         self.assertAlmostEqualPrayer(prayers["isha"], isha, err)
-
 
     def assertAlmostEqualPrayer(self, p1, p2, err):
         """

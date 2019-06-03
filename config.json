@@ -1,0 +1,10 @@
+{
+  "longitude": "50.0000",
+  "latitude": "26.6000",
+  "timezone": "3",
+  "fajr_isha": "umm_alqura",
+  "asr": "standard",
+  "output_prayer": "../output/prayer.json",
+  "block_duration": 10
+}
+

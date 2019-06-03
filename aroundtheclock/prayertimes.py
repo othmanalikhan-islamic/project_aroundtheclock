@@ -28,14 +28,24 @@ implementation for more details.
 import datetime as dt
 import json
 import random
+import subprocess
+import time
 from collections import OrderedDict
-from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 from pathlib import Path
 
 import julian
+import schedule
+from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 
 
-################################################# PUBLIC FUNCTIONS
+################################################# PUBLIC FUNCTIONS (SCHEDULING)
+
+def blockNetwork():
+    p = subprocess.run("ping www.google.com")
+
+    return schedule.CancelJob
+
+################################################# PUBLIC FUNCTIONS (PRAYER)
 
 
 def writePrayerTimes(prayers, PATH_OUT):
@@ -53,27 +63,6 @@ def writePrayerTimes(prayers, PATH_OUT):
         json.dump(prayers, f, indent=4)
 
 
-def writeCronTimes(cronTimes, PATH_OUT):
-    """
-    Writes the Cron times for each prayer into a file.
-
-    The purpose thereafter is to use this file with Cron in Linux to schedule
-    a task to pause the local internet between the Cron times for each prayer.
-
-    :param cronTimes: List, containing (startTime, endTime) for each prayer.
-    :param PATH_OUT: Path, the output file to write to.
-    """
-    CRON_FORMAT = "%H:%M"
-    print("\nCron Times:")
-    with open(PATH_OUT, "w") as f:
-        for startTime, endTime in cronTimes:
-            startTime = startTime.strftime(CRON_FORMAT)
-            endTime = endTime.strftime(CRON_FORMAT)
-            line = "{},{}\n".format(startTime, endTime)
-            f.write(line)
-            print(line, end="")
-
-
 def printAllPrayerTimes(prayers):
     """
     Prints the prayer times in a neat table.
@@ -85,22 +74,6 @@ def printAllPrayerTimes(prayers):
     PRINT_FORMAT = "%Y-%m-%d %H:%M"
     for prayer, time in prayers.items():
         print("{:<8}: {}".format(prayer, time.strftime(PRINT_FORMAT)))
-
-
-def _computePrayerCronTiming(prayer, blockTime):
-    """
-    Calculates Cron timings for a particular prayer.
-
-        startTime = prayer - blockTime/2
-        endTime   = prayer + blockTime/2
-
-    :param prayer: datetime.datetime, the prayer to generate Cron timings for.
-    :param blockTime: Number, the duration of the blocked time in minutes.
-    :return: 2-Tuple, (startTime, endTime) as datetime.datetime objects.
-    """
-    startTime = prayer - dt.timedelta(minutes=blockTime/2)
-    endTime = prayer + dt.timedelta(minutes=blockTime/2)
-    return startTime, endTime
 
 
 def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrConvention):
@@ -324,6 +297,35 @@ def _asrEquation(shadowLength, latitude, declination):
 
 ################################################# NUMERICAL FUNCTIONS
 
+def __guessKhobarCoordinates():
+    """
+    Attempts to find the coordinates for my hometown in Khobar.
+
+    NOTE: This function is only for personal use and has hardcoded values.
+    """
+    timezone = 3
+    fajrIshaConvention = "umm_alqura"
+    asrConvention = "standard"
+    coord = longitude, latitude = 50.0000, 26.6000
+
+    FORMAT = "%Y-%m-%d %H:%M"
+    date = dt.datetime(2019, 1, 27)
+    fajr = dt.datetime.strptime("2019-01-27 05:03", FORMAT)
+    thuhr = dt.datetime.strptime("2019-01-27 11:53", FORMAT)
+    asr = dt.datetime.strptime("2019-01-27 14:57", FORMAT)
+    maghrib = dt.datetime.strptime("2019-01-27 17:19", FORMAT)
+    isha = dt.datetime.strptime("2019-01-27 18:49", FORMAT)
+    prayers = [fajr, thuhr, asr, maghrib, isha]
+
+    longitudeRange = [longitude-2, longitude+2]
+    latitudeRange = [latitude-2, latitude+2]
+
+    longitude, latitude, err = \
+        guessCoordinates(prayers,
+                         longitudeRange, latitudeRange,
+                         date, timezone, fajrIshaConvention, asrConvention)
+    print(f"Khobar Coordinates: LON={longitude}, LAT={latitude}, ERR={err}")
+
 
 def guessCoordinates(prayers,
                      longitudeRange, latitudeRange,
@@ -392,40 +394,51 @@ def computeDiff(p1, p2):
 
 
 def main():
-    t = dt.date.today()
-    date = dt.datetime(t.year, t.month, t.day)
-    coord = longitude, latitude = 50.0000, 26.6000
-    timezone = 3
-    fajrIshaConvention = "umm_alqura"
-    asrConvention = "standard"
-    PATH_CRON = Path("cron.txt")
-    PATH_JSON = Path("prayer.json")
+    """
+    Runs the script.
+    """
+    # Reading CONFIG file
+    CONFIG = Path("../config.json")
+    with open(CONFIG, "r") as f:
+        PARAM = json.load(f)
+        longitude, latitude = float(PARAM["longitude"]), float(PARAM["latitude"])
+        coord = (longitude, latitude)
+        timezone = int(PARAM["timezone"])
+        fajrIshaConv = PARAM["fajr_isha"]
+        asrConv = PARAM["asr"]
+        PATH_JSON = Path(PARAM["output_prayer"])
+        blockDuration = PARAM["block_duration"]
 
-    prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
-    printAllPrayerTimes(prayers)
+    # Schedule today's prayer blocking times otherwise wait on existing jobs.
+    while True:
+        if schedule.default_scheduler.next_run:
+            schedule.run_pending()
+            time.sleep(1)
+        else:
+            t = dt.date.today()
+            date = dt.datetime(t.year, t.month, t.day)
+            prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConv, asrConv)
+            writePrayerTimes(prayers, PATH_JSON)
+            printAllPrayerTimes(prayers)
 
-    cronTimes = [_computePrayerCronTiming(t, 10) for p, t in prayers.items()]
-    writeCronTimes(cronTimes, PATH_CRON)
-    writePrayerTimes(prayers, PATH_JSON)
+            FORMAT = "%H:%M"
+            prayers = {p: t.strftime(FORMAT) for p, t in prayers.items()}
+            n = blockDuration
 
-    # Numerical Analysis on Longitude and Latitude coordinates
-    # FORMAT = "%Y-%m-%d %H:%M"
-    # date = dt.datetime(2019, 1, 27)
-    # fajr = dt.datetime.strptime("2019-01-27 05:03", FORMAT)
-    # thuhr = dt.datetime.strptime("2019-01-27 11:53", FORMAT)
-    # asr = dt.datetime.strptime("2019-01-27 14:57", FORMAT)
-    # maghrib = dt.datetime.strptime("2019-01-27 17:19", FORMAT)
-    # isha = dt.datetime.strptime("2019-01-27 18:49", FORMAT)
-    # prayers = [fajr, thuhr, asr, maghrib, isha]
-
-    # longitudeRange = [longitude-2, longitude+2]
-    # latitudeRange = [latitude-2, latitude+2]
-
-    # longitude, latitude, err = \
-    #     guessCoordinates(prayers,
-    #                      longitudeRange, latitudeRange,
-    #                      date, timezone, fajrIshaConvention, asrConvention)
-    # print(longitude, latitude, err)
+            # Bug: Suppose that it is just after Asr today. Then scheduling
+            # as below will cause maghrib and isha to trigger correctly,
+            # but will cause fajr, thuhr, and asr of today to run for
+            # tomorrow's schedule.
+            # This is not a major issue as the time delta between prayers is
+            # about 1 or 2 minutes at most, so the schedule will be off by
+            # that much.
+            schedule.clear("daily")
+            schedule.every().day.at(prayers["fajr"]).do(blockNetwork, n).tag("daily")
+            schedule.every().day.at(prayers["thuhr"]).do(blockNetwork, n).tag("daily")
+            schedule.every().day.at(prayers["asr"]).do(blockNetwork, n).tag("daily")
+            schedule.every().day.at(prayers["maghrib"]).do(blockNetwork, n).tag("daily")
+            schedule.every().day.at(prayers["isha"]).do(blockNetwork, n).tag("daily")
+            # print(schedule.default_scheduler.next_run)
 
 
 if __name__ == "__main__":

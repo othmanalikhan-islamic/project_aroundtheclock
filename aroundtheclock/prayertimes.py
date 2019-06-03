@@ -40,9 +40,27 @@ from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 
 ################################################# PUBLIC FUNCTIONS (SCHEDULING)
 
-def blockNetwork():
-    p = subprocess.run("ping www.google.com")
+def blockInternet(duration):
+    """
+    For the physical device running this script that is connected to a
+    network, arp poisons its default gateway on the network for all hosts,
+    thereby 'suspending' connectivity to WAN (internet) for the given duration.
 
+    Pre-requisites for this function to run properly:
+        1. Install arpspoof on OS: sudo apt-get install dsniffer.
+        2. Run this function using an OS account with privileges.
+
+    :param duration: Integer, the block duration in minutes.
+    :return: Scheduler.CancelJob, making this function a one-off job (no repeat).
+    """
+    # Fetch network parameters from OS for arp spoofing
+    p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
+    GATEWAY = p1.stdout.split()[2]
+    INTERFACE = p1.stdout.split()[4]
+
+    # Arp spoof entire network for a limited duration
+    min = str(duration*60)
+    p2 = subprocess.run(["sudo", "timeout", min, "arpspoof", "-i", INTERFACE, GATEWAY])
     return schedule.CancelJob
 
 ################################################# PUBLIC FUNCTIONS (PRAYER)
@@ -433,11 +451,11 @@ def main():
             # about 1 or 2 minutes at most, so the schedule will be off by
             # that much.
             schedule.clear("daily")
-            schedule.every().day.at(prayers["fajr"]).do(blockNetwork, n).tag("daily")
-            schedule.every().day.at(prayers["thuhr"]).do(blockNetwork, n).tag("daily")
-            schedule.every().day.at(prayers["asr"]).do(blockNetwork, n).tag("daily")
-            schedule.every().day.at(prayers["maghrib"]).do(blockNetwork, n).tag("daily")
-            schedule.every().day.at(prayers["isha"]).do(blockNetwork, n).tag("daily")
+            schedule.every().day.at(prayers["fajr"]).do(blockInternet, n).tag("daily")
+            schedule.every().day.at(prayers["thuhr"]).do(blockInternet, n).tag("daily")
+            schedule.every().day.at(prayers["asr"]).do(blockInternet, n).tag("daily")
+            schedule.every().day.at(prayers["maghrib"]).do(blockInternet, n).tag("daily")
+            schedule.every().day.at(prayers["isha"]).do(blockInternet, n).tag("daily")
             # print(schedule.default_scheduler.next_run)
 
 

@@ -4,7 +4,8 @@
   "timezone": "3",
   "fajr_isha": "umm_alqura",
   "asr": "standard",
-  "output_prayer": "../output/prayer.json",
-  "block_duration": 10
+
+  "block_duration": 10,
+  "output_prayer": "../output/prayer.json"
 }
 

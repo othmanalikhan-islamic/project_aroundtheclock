@@ -5,7 +5,18 @@
   "fajr_isha": "umm_alqura",
   "asr": "standard",
 
-  "block_duration": 10,
-  "output_prayer": "../output/prayer.json"
+  "block" : {
+    "fajr": 10,
+    "thuhr": 10,
+    "asr": 10,
+    "maghrib": 10,
+    "isha": 10
+  },
+
+  "path" : {
+    "prayer": "../output/prayer.json",
+    "log": "../output/log.txt"
+  }
+
 }
 

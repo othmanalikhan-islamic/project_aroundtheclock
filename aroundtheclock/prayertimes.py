@@ -27,8 +27,10 @@ implementation for more details.
 
 import datetime as dt
 import json
+import logging
 import random
 import subprocess
+import sys
 import time
 from collections import OrderedDict
 from pathlib import Path
@@ -39,6 +41,7 @@ from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 
 
 ################################################# PUBLIC FUNCTIONS (SCHEDULING)
+
 
 def blockInternet(duration):
     """
@@ -62,6 +65,7 @@ def blockInternet(duration):
     min = str(duration*60)
     p2 = subprocess.run(["sudo", "timeout", min, "arpspoof", "-i", INTERFACE, GATEWAY])
     return schedule.CancelJob
+
 
 ################################################# PUBLIC FUNCTIONS (PRAYER)
 
@@ -315,6 +319,7 @@ def _asrEquation(shadowLength, latitude, declination):
 
 ################################################# NUMERICAL FUNCTIONS
 
+
 def __guessKhobarCoordinates():
     """
     Attempts to find the coordinates for my hometown in Khobar.
@@ -411,21 +416,23 @@ def computeDiff(p1, p2):
 ################################################# RUNNING SCRIPT
 
 
-def main():
+def main(CONFIG):
     """
     Runs the script.
+
+    :param CONFIG: Dictionary, containing JSON data of config.json.
     """
-    # Reading CONFIG file
-    CONFIG = Path("../config.json")
-    with open(CONFIG, "r") as f:
-        PARAM = json.load(f)
-        longitude, latitude = float(PARAM["longitude"]), float(PARAM["latitude"])
-        coord = (longitude, latitude)
-        timezone = int(PARAM["timezone"])
-        fajrIshaConv = PARAM["fajr_isha"]
-        asrConv = PARAM["asr"]
-        PATH_JSON = Path(PARAM["output_prayer"])
-        blockDuration = PARAM["block_duration"]
+    ######################################## INITIALISING VARIABLES
+
+    longitude, latitude = float(CONFIG["longitude"]), float(CONFIG["latitude"])
+    coord = (longitude, latitude)
+    timezone = int(CONFIG["timezone"])
+    fajrIshaConv = CONFIG["fajr_isha"]
+    asrConv = CONFIG["asr"]
+    PATH_JSON = Path(CONFIG["path"]["prayer"])
+    blockMapping = CONFIG["block"]
+
+    ######################################## SCHEDULING
 
     # Schedule today's prayer blocking times otherwise wait on existing jobs.
     while True:
@@ -433,31 +440,62 @@ def main():
             schedule.run_pending()
             time.sleep(1)
         else:
+            FORMAT_SCHEDULE = "%H:%M"
+            FORMAT_PRINT = "%Y-%m-%d %H:%M"
+
+            # Computing prayer times
+            logging.info(f"Computing today's prayer times {dt.date.today()}!")
             t = dt.date.today()
             date = dt.datetime(t.year, t.month, t.day)
             prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConv, asrConv)
+
+            # Logging prayer times computed
+            ps = [f"{p}: {t.strftime(FORMAT_PRINT)}" for p, t in prayers.items()]
+            timings = ", ".join(ps)
+            logging.info(f"Prayer times generated: {timings}.")
             writePrayerTimes(prayers, PATH_JSON)
             printAllPrayerTimes(prayers)
 
-            FORMAT = "%H:%M"
-            prayers = {p: t.strftime(FORMAT) for p, t in prayers.items()}
-            n = blockDuration
+            # Scheduling prayer block times as jobs
+            # NOTE: This logic is simple and sometimes allows prayers from
+            # yesterday to be scheduled for tomorrow. Undesirable but not
+            # much of an issue as delta between prayers 1 day apart is no
+            # more than 2 minutes.
+            for p, t in prayers.items():
+                t = t.strftime(FORMAT_SCHEDULE)
+                duration = blockMapping[p]
+                schedule.every().day.at(t).do(blockInternet, duration)
 
-            # Bug: Suppose that it is just after Asr today. Then scheduling
-            # as below will cause maghrib and isha to trigger correctly,
-            # but will cause fajr, thuhr, and asr of today to run for
-            # tomorrow's schedule.
-            # This is not a major issue as the time delta between prayers is
-            # about 1 or 2 minutes at most, so the schedule will be off by
-            # that much.
-            schedule.clear("daily")
-            schedule.every().day.at(prayers["fajr"]).do(blockInternet, n).tag("daily")
-            schedule.every().day.at(prayers["thuhr"]).do(blockInternet, n).tag("daily")
-            schedule.every().day.at(prayers["asr"]).do(blockInternet, n).tag("daily")
-            schedule.every().day.at(prayers["maghrib"]).do(blockInternet, n).tag("daily")
-            schedule.every().day.at(prayers["isha"]).do(blockInternet, n).tag("daily")
-            # print(schedule.default_scheduler.next_run)
+            # Logging scheduled jobs
+            for j in schedule.jobs:
+                logging.info(f"Job scheduled: {j}.")
+            logging.info(f"Next job at {schedule.default_scheduler.next_run}.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        # Reading config file
+        PATH_CONFIG = Path("../config.json")
+        with open(PATH_CONFIG, "r") as f:
+            CONFIG = json.load(f)
+
+        # Initialising logging
+
+        FORMAT_LOG = "%(asctime)s: %(message)s"
+        FORMAT_TIME = "%Y-%m-%d %H:%M:%S"
+        fileHandler = logging.FileHandler(CONFIG["path"]["log"])
+        fileHandler.setLevel(logging.INFO)
+        fileHandler.setFormatter(logging.Formatter(FORMAT_LOG, FORMAT_TIME))
+        console = logging.StreamHandler(sys.stdout)
+        console.setLevel(logging.INFO)
+        console.setFormatter(logging.Formatter(FORMAT_LOG))
+
+        root = logging.getLogger()
+        root.setLevel(logging.INFO)
+        root.addHandler(console)
+        root.addHandler(fileHandler)
+
+        main(CONFIG)
+
+    except Exception as e:
+        logging.exception("An unexpected error has occured!")

@@ -510,7 +510,9 @@ def main(CONFIG):
 if __name__ == "__main__":
     try:
         # Reading config file
-        PATH_CONFIG = Path("../config.json")
+        PATH_CONFIG = Path("../config.json").absolute().resolve()
+
+
         with open(PATH_CONFIG, "r") as f:
             CONFIG = json.load(f)
 

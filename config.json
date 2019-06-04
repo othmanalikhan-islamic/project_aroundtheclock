@@ -1,6 +1,6 @@
 {
   "longitude": "50.0000",
-  "latitude": "26.6000",
+  "latitude": "26.5000",
   "timezone": "3",
   "fajr_isha": "umm_alqura",
   "asr": "standard",
@@ -17,6 +17,5 @@
     "prayer": "../output/prayer.json",
     "log": "../output/log.txt"
   }
-
 }
 

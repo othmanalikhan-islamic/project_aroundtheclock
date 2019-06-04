@@ -1,0 +1,3 @@
+supervisorctl reread
+supervisorctl update
+supervisorctl status

@@ -18,7 +18,7 @@ How to Use
 1. Download or clone the repository.
 2. Run `install.sh`.
 3. Modify `config.json` to your geolocation.
-4. Run `run.sh` to start the script.
+4. Run `run.sh` to start the script and enable it at boot time.
 5. Use `systemctl status` and/or navigate to `output/` for more details.
 
 

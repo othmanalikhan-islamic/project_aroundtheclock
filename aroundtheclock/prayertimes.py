@@ -26,6 +26,7 @@ implementation for more details.
 """
 
 import datetime as dt
+import functools
 import json
 import logging
 import random
@@ -40,9 +41,38 @@ import schedule
 from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 
 
+################################################# DECORATORS
+
+
+def oneTimeJob(func):
+    """
+    Decorator that causes the given scheduled function to run only once.
+    As a bonus, it also logs the subsequent job to be ran.
+
+    NOTE: This decorator suppresses any results returned by the given function.
+
+    :param func: function, the function to be wrapped.
+    :return: function, the wrapped function.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        func(*args, **kwargs)
+
+        # Log when next job is occurring
+        try:
+            schedule.cancel_job(schedule.jobs[0])
+            logging.info(f"Next job at {schedule.default_scheduler.next_run}.")
+        except Exception:
+            pass    # Try or die trying...
+
+        return schedule.CancelJob
+    return wrapper
+
+
 ################################################# PUBLIC FUNCTIONS (SCHEDULING)
 
 
+@oneTimeJob
 def blockInternet(duration):
     """
     For the physical device running this script that is connected to a
@@ -58,13 +88,18 @@ def blockInternet(duration):
     """
     # Fetch network parameters from OS for arp spoofing
     p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
-    GATEWAY = p1.stdout.split()[2]
-    INTERFACE = p1.stdout.split()[4]
+    GATEWAY = p1.stdout.split()[2].decode("ascii")
+    INTERFACE = p1.stdout.split()[4].decode("ascii")
+    logging.info(f"Found GW={GATEWAY}, INT={INTERFACE}")
 
     # Arp spoof entire network for a limited duration
-    min = str(duration*60)
-    p2 = subprocess.run(["sudo", "timeout", min, "arpspoof", "-i", INTERFACE, GATEWAY])
-    return schedule.CancelJob
+    try:
+        logging.info(f"Blocking internet for {duration} minute(s)!")
+        seconds = duration*60
+        subprocess.run(["sudo", "timeout", str(seconds), "arpspoof", "-i", INTERFACE, GATEWAY],
+                       timeout=seconds)
+    except subprocess.TimeoutExpired:
+        logging.info(f"Block time over, unblocking internet now!")
 
 
 ################################################# PUBLIC FUNCTIONS (PRAYER)
@@ -488,7 +523,7 @@ if __name__ == "__main__":
         fileHandler.setFormatter(logging.Formatter(FORMAT_LOG, FORMAT_TIME))
         console = logging.StreamHandler(sys.stdout)
         console.setLevel(logging.INFO)
-        console.setFormatter(logging.Formatter(FORMAT_LOG))
+        console.setFormatter(logging.Formatter(FORMAT_LOG, FORMAT_TIME))
 
         root = logging.getLogger()
         root.setLevel(logging.INFO)

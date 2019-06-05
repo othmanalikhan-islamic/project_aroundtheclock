@@ -76,3 +76,7 @@ target/
 
 # Output
 output/
+
+# Behind the scenes files
+docs/demo.xcf
+docs/virtualbox_networking.rst

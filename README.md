@@ -17,7 +17,8 @@ Above is a demo that illustrates it in action: The scenario is that it is
 approaching Asr prayer time and the internet needs to be 'paused' temporarily.
 The VM on the left is running the AroundTheClock script and on the VM on the right
 is a regular user on the same network. Once the time hits Asr (15:05:00), the 
-internet is 'paused'. For the purposes of the demo, the clock is manually set.
+internet is 'paused'. For the purposes of the demo, the the script and clock 
+are manually controlled, however, in a real-world scenario is is fully automated.
 
 This is achieved by calculating the prayer times for the geolocation 
 specified in `config.json` then scheduling tasks in Python to disable the 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 echo -e "Creating a 'Python' virtual environment and installing dependencies!\n"
-pyvenv aroundtheclock-venv
-source ./aroundtheclock/bin/activate
+pyvenv venv
+source ./venv/bin/activate
 yes | pip3 install -r requirements.txt
 
 echo -e "Installing 'dnsiff' dependency!\n"

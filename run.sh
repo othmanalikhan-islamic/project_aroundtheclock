@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-./aroundtheclock/bin/python aroundtheclock/prayer.py
+./venv/bin/python aroundtheclock/prayer.py

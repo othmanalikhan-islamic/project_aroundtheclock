@@ -3,6 +3,7 @@ echo -e "Creating a 'Python' virtual environment and installing dependencies!\n"
 pyvenv venv
 source ./venv/bin/activate
 yes | pip3 install -r requirements.txt
+mkdir output
 
 echo -e "Installing 'dnsiff' dependency!\n"
 yes | sudo apt-get install dsniff             # To block internet via 'arpspoof' module

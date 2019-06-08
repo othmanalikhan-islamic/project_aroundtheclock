@@ -512,12 +512,12 @@ def main(CONFIG):
 if __name__ == "__main__":
     try:
         # Reading config file
-        PATH_CONFIG = Path(PATH_ROOT, "config.json")
+        PATH_CONFIG = Path(PATH_ROOT, "config.json").absolute().resolve()
         with open(str(PATH_CONFIG), "r") as f:
             CONFIG = json.load(f)
 
         # Creating output directory
-        PATH_OUT = Path(PATH_ROOT, "output")
+        PATH_OUT = Path(PATH_ROOT, "output").absolute().resolve()
         PATH_OUT.mkdir(parents=True, exist_ok=True)
 
         # Initialising logging

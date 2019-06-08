@@ -1,3 +1,4 @@
-supervisorctl reread
-supervisorctl update
-supervisorctl status
+#!/usr/bin/env bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status

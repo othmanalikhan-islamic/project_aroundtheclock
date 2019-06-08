@@ -41,6 +41,7 @@ import julian
 import schedule
 from math import acos, asin, atan, atan2, cos, degrees, radians, sin, tan
 
+PATH_ROOT = Path(__file__, "../../")
 
 ################################################# DECORATORS
 
@@ -511,10 +512,13 @@ def main(CONFIG):
 if __name__ == "__main__":
     try:
         # Reading config file
-        PATH_CONFIG = Path("../config.json").absolute().resolve()
-        os.makedirs("../output", exist_ok=True)
+        PATH_CONFIG = Path(PATH_ROOT, "config.json")
         with open(str(PATH_CONFIG), "r") as f:
             CONFIG = json.load(f)
+
+        # Creating output directory
+        PATH_OUT = Path(PATH_ROOT, "output")
+        PATH_OUT.mkdir(parents=True, exist_ok=True)
 
         # Initialising logging
 

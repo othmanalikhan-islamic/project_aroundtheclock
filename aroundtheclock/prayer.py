@@ -29,6 +29,7 @@ import datetime as dt
 import functools
 import json
 import logging
+import os
 import random
 import subprocess
 import sys
@@ -116,7 +117,7 @@ def writePrayerTimes(prayers, PATH_OUT):
 
     prayers = [(p, t.strftime(DATETIME_FORMAT)) for p, t in prayers.items()]
     prayers = OrderedDict(prayers)
-    with open(PATH_OUT, 'w') as f:
+    with open(str(PATH_OUT), 'w') as f:
         json.dump(prayers, f, indent=4)
 
 
@@ -511,9 +512,8 @@ if __name__ == "__main__":
     try:
         # Reading config file
         PATH_CONFIG = Path("../config.json").absolute().resolve()
-
-
-        with open(PATH_CONFIG, "r") as f:
+        os.makedirs("../output", exist_ok=True)
+        with open(str(PATH_CONFIG), "r") as f:
             CONFIG = json.load(f)
 
         # Initialising logging

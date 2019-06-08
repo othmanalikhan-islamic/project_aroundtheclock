@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-./venv/bin/python aroundtheclock/prayer.py
+source venv/bin/activate
+python aroundtheclock/prayer.py

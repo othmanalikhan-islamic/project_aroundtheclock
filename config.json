@@ -14,8 +14,8 @@
   },
 
   "path" : {
-    "prayer": "../output/prayer.json",
-    "log": "../output/log.txt"
+    "prayer": "output/prayer.json",
+    "log": "output/log.txt"
   }
 }
 

@@ -1,4 +1,2 @@
 #!/usr/bin/env bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl status
+./aroundtheclock/bin/python aroundtheclock/prayer.py

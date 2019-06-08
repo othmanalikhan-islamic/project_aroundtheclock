@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-echo -e "Installing 'Python' dependencies!\n"
+echo -e "Creating a 'Python' virtual environment and installing dependencies!\n"
+pyvenv aroundtheclock-venv
+source ./aroundtheclock/bin/activate
 yes | pip3 install -r requirements.txt
 
 echo -e "Installing 'dnsiff' dependency!\n"
@@ -11,7 +13,7 @@ PATH_TMP=./supervisord_tmp.conf
 PATH_DST=/etc/supervisor/conf.d/aroundtheclock.conf
 yes | sudo apt-get install supervisor         # To ensure reliability of running script
 sudo cp $PATH_SRC $PATH_TMP
-sed -i 's|<PATH_TO_PROJECT_ROOT>|$(pwd)|g' $PATH_TMP
+sed -i "s|<PATH_TO_PROJECT_ROOT>|$(pwd)|g" $PATH_TMP
 sudo mv $PATH_TMP $PATH_DST
 echo -e "A new supervisor config file is located at $PATH_DST!\n"
 

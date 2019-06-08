@@ -61,7 +61,7 @@ def oneTimeJob(func):
         # Log when next job is occurring
         try:
             schedule.cancel_job(schedule.jobs[0])
-            logging.info(f"Next job at {schedule.default_scheduler.next_run}.")
+            logging.info("Next job at {}.".format(schedule.default_scheduler.run))
         except Exception:
             pass    # Try or die trying...
 
@@ -90,16 +90,16 @@ def blockInternet(duration):
     p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
     GATEWAY = p1.stdout.split()[2].decode("ascii")
     INTERFACE = p1.stdout.split()[4].decode("ascii")
-    logging.info(f"Found GW={GATEWAY}, INT={INTERFACE}")
+    logging.info("Found GW={}, INT={}".format(GATEWAY, INTERFACE))
 
     # Arp spoof entire network for a limited duration
     try:
-        logging.info(f"Blocking internet for {duration} minute(s)!")
+        logging.info("Blocking internet for {} minute(s)!".format(duration))
         seconds = duration*60
         subprocess.run(["sudo", "timeout", str(seconds), "arpspoof", "-i", INTERFACE, GATEWAY],
                        timeout=seconds)
     except subprocess.TimeoutExpired:
-        logging.info(f"Block time over, unblocking internet now!")
+        logging.info("Block time over, unblocking internet now!")
 
 
 ################################################# PUBLIC FUNCTIONS (PRAYER)
@@ -382,7 +382,7 @@ def __guessKhobarCoordinates():
         guessCoordinates(prayers,
                          longitudeRange, latitudeRange,
                          date, timezone, fajrIshaConvention, asrConvention)
-    print(f"Khobar Coordinates: LON={longitude}, LAT={latitude}, ERR={err}")
+    print("Khobar Coordinates: LON={}, LAT={}, ERR={}".format(longitude, latitude, err))
 
 
 def guessCoordinates(prayers,
@@ -479,15 +479,15 @@ def main(CONFIG):
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
 
             # Computing prayer times
-            logging.info(f"Computing today's prayer times {dt.date.today()}!")
+            logging.info("Computing today's prayer times {}!".format(dt.date.today()))
             t = dt.date.today()
             date = dt.datetime(t.year, t.month, t.day)
             prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConv, asrConv)
 
             # Logging prayer times computed
-            ps = [f"{p}: {t.strftime(FORMAT_PRINT)}" for p, t in prayers.items()]
+            ps = ["{}: {}".format(p, t.strftime(FORMAT_PRINT)) for p, t in prayers.items()]
             timings = ", ".join(ps)
-            logging.info(f"Prayer times generated: {timings}.")
+            logging.info("Prayer times generated: {}.".format(timings))
             writePrayerTimes(prayers, PATH_JSON)
             printAllPrayerTimes(prayers)
 
@@ -503,8 +503,8 @@ def main(CONFIG):
 
             # Logging scheduled jobs
             for j in schedule.jobs:
-                logging.info(f"Job scheduled: {j}.")
-            logging.info(f"Next job at {schedule.default_scheduler.next_run}.")
+                logging.info("Job scheduled: {}.".format(j))
+            logging.info("Next job at {}.".format(schedule.default_scheduler.next_run))
 
 
 if __name__ == "__main__":

@@ -8,10 +8,15 @@ python:
 
 install:
     - pip install -r requirements.txt
+    - pip install pytest pytest-cov
 
 script:
-    - pytest
+    - pytest --cov=./
+
 
 branches:
     only:
         - master
+
+after_success: 
+    - codecov --file coverage/lcov.info --disable search

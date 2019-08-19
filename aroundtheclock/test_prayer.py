@@ -57,8 +57,8 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         LAT = 26.2172
         date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayer.computeFajr(date, ANG, LAT, thuhr)
-        self.assertAlmostEqualPrayer(prayer, fajr, 3)
+        p = prayer.computeFajr(date, ANG, LAT, thuhr)
+        self.assertAlmostEqualPrayer(p, fajr, 3)
 
     def testComputeThuhr_khobarCity_calculateKhobarThuhr(self):
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
@@ -66,8 +66,8 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         TZ = 3
         LON = 50.2083
         date = dt.datetime(2019, 2, 4)
-        prayer = prayer.computeThuhr(date, LON, TZ)
-        self.assertAlmostEqualPrayer(prayer, thuhr, 3)
+        p = prayer.computeThuhr(date, LON, TZ)
+        self.assertAlmostEqualPrayer(p, thuhr, 3)
 
     def testComputeAsr_khobarCity_calculateKhobarAsr(self):
         asr = dt.datetime.strptime("2019-02-04 15:02", self.FORMAT)
@@ -76,8 +76,8 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         shadowLength = 1
         date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayer.computeAsr(date, shadowLength, LAT, thuhr)
-        self.assertAlmostEqualPrayer(prayer, asr, 3)
+        p = prayer.computeAsr(date, shadowLength, LAT, thuhr)
+        self.assertAlmostEqualPrayer(p, asr, 3)
 
     def testComputeMaghrib_khobarCity_calculateKhobarMaghrib(self):
         maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
@@ -86,15 +86,15 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         LAT = 26.2172
         date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayer.computeMaghrib(date, LAT, thuhr, angle=ANG)
-        self.assertAlmostEqualPrayer(prayer, maghrib, 3)
+        p = prayer.computeMaghrib(date, LAT, thuhr, angle=ANG)
+        self.assertAlmostEqualPrayer(p, maghrib, 3)
 
     def testComputeIshaUmmAlQura_khobarCity_return90MinuteFromMaghrib(self):
         isha = dt.datetime.strptime("2019-02-04 18:56", self.FORMAT)
 
         maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
-        prayer = prayer.computeIshaUmmAlQura(maghrib)
-        self.assertAlmostEqualPrayer(prayer, isha, 0)   # No error acceptable
+        p = prayer.computeIshaUmmAlQura(maghrib)
+        self.assertAlmostEqualPrayer(p, isha, 0)   # No error acceptable
 
     def testComputeIsha_khobarCity_calculateKhobarIsha(self):
         isha = dt.datetime.strptime("2019-02-04 18:29", self.FORMAT)
@@ -103,58 +103,58 @@ class IntegrationTestPrayerModule(unittest.TestCase):
         LAT = 26.2172
         date = dt.datetime(2019, 2, 4)
         thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        prayer = prayer.computeIsha(date, ANG, LAT, thuhr)
-        self.assertAlmostEqualPrayer(prayer, isha, 3)
+        p = prayer.computeIsha(date, ANG, LAT, thuhr)
+        self.assertAlmostEqualPrayer(p, isha, 3)
 
     def testComputeAllPrayerTimes_khobarCity20190127_calculatePrecisely(self):
-            prayers = [
+            ps = [
                 "2019-01-27 05:05",
                 "2019-01-27 11:53",
                 "2019-01-27 14:58",
                 "2019-01-27 17:19",
                 "2019-01-27 18:49"
             ]
-            self.assertAlmostEqualAllPrayers(prayers, 2)
+            self.assertAlmostEqualAllPrayers(ps, 2)
 
     def testComputeAllPrayerTimes_khobarCity20190207_calculatePrecisely(self):
-        prayers = [
+        ps = [
             "2019-02-07 05:00",
             "2019-02-07 11:54",
             "2019-02-07 15:05",
             "2019-02-07 17:28",
             "2019-02-07 18:58"
         ]
-        self.assertAlmostEqualAllPrayers(prayers, 2)
+        self.assertAlmostEqualAllPrayers(ps, 2)
 
     def testComputeAllPrayerTimes_khobarCity20190210_calculatePrecisely(self):
-        prayers = [
+        ps = [
             "2019-02-10 04:59",
             "2019-02-10 11:54",
             "2019-02-10 15:06",
             "2019-02-10 17:29",
             "2019-02-10 18:59"
         ]
-        self.assertAlmostEqualAllPrayers(prayers, 2)
+        self.assertAlmostEqualAllPrayers(ps, 2)
 
     def testComputeAllPrayerTimes_khobarCity20190602_calculatePrecisely(self):
-        prayers = [
+        ps = [
             "2019-06-02 03:15",
             "2019-06-02 11:38",
             "2019-06-02 15:05",
             "2019-06-02 18:29",
             "2019-06-02 19:59",
         ]
-        self.assertAlmostEqualAllPrayers(prayers, 1)
+        self.assertAlmostEqualAllPrayers(ps, 1)
 
     def testComputeAllPrayerTimes_khobarCity20190810_calculatePrecisely(self):
-        prayers = [
+        ps = [
             "2019-08-10 03:42",
             "2019-08-10 11:46",
             "2019-08-10 15:16",
             "2019-08-10 18:21",
             "2019-08-10 19:51",
         ]
-        self.assertAlmostEqualAllPrayers(prayers, 1)
+        self.assertAlmostEqualAllPrayers(ps, 1)
 
     def assertAlmostEqualAllPrayers(self, prayers, err):
         """

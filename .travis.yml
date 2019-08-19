@@ -2,13 +2,11 @@ language: python
 
 python: 
     - "3.4"
-    - "3.5"
-    - "3.6"
     - "3.7"
 
 install:
     - pip install -r requirements.txt
-    - pip install pytest pytest-cov
+    - pip install pytest pytest-cov codecov
 
 script:
     - pytest --cov=./
@@ -19,4 +17,4 @@ branches:
         - master
 
 after_success: 
-    - codecov --file coverage/lcov.info --disable search
+    - codecov

@@ -1,5 +1,5 @@
 Project: AroundTheClock
------------------------
+=======================
 
 <br>
 <p align="center">
@@ -7,6 +7,16 @@ Project: AroundTheClock
 </p>
 <br>
 
+
+[![Build Status](https://travis-ci.org/OthmanEmpire/project_aroundtheclock.svg?branch=master)](https://travis-ci.org/OthmanEmpire/project_aroundtheclock)
+[![Code Coverage](https://codecov.io/gh/OthmanEmpire/project_aroundtheclock/branch/master/graphs/badge.svg)](https://codecov.io/gh/OthmanEmpire/project_aroundtheclock/branch/master)
+[![Last Commit](https://img.shields.io/github/last-commit/othmanempire/project_aroundtheclock)](https://github.com/OthmanEmpire/project_aroundtheclock)
+[![Issues](https://img.shields.io/github/issues-raw/othmanempire/project_aroundtheclock)](https://github.com/OthmanEmpire/project_aroundtheclock)
+[![Known Vulnerabilities](https://snyk.io//test/github/OthmanEmpire/project_aroundtheclock/badge.svg?targetFile=requirements.txt)](https://snyk.io//test/github/OthmanEmpire/project_aroundtheclock?targetFile=requirements.txt)
+[![License](https://img.shields.io/github/license/othmanempire/project_aroundtheclock)](https://github.com/OthmanEmpire/project_aroundtheclock)
+
+Overview
+--------
 
 The objective of AroundTheClock is AroundTheClock is a self-improvement project 
 that is aimed to help muslims regulate praying on time by temporarily disabling 

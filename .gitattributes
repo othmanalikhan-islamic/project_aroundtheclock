@@ -1,4 +1,6 @@
-# Basic .gitattributes for a python repo.
+# General
+# =======
+*	text=auto
 
 # Source files
 # ============

@@ -1,5 +1,5 @@
-Project: AroundTheClock
-=======================
+Project AroundTheClock: Praying on Time!
+========================================
 
 <br>
 <p align="center">
@@ -41,11 +41,18 @@ other machine), connect it to your home network, and leave it running.
 
 How to Use
 ----------
-1. Download or clone the repository.
-2. Run `install.sh`.
-3. Modify `config.json` to your geolocation.
+1. Clone the repository, `git clone https://github.com/OthmanEmpire/project_aroundtheclock`
+2. Navigate to the root project directory, `cd project_aroundtheclock`
+3. Modify `config.json` to your geolocation, `vi config.json`
+4. Change permissions of the installation script, `chmod u+x install.sh`
+5. Run the installation script, `./install.sh`.
+
+
+Troubleshooting
+---------------
+5. Use `systemctl status supervisor` and/or navigate to `output/` for more details.
 4. Run `run.sh` to start the script and enable it at boot time.
-5. Use `systemctl status` and/or navigate to `output/` for more details.
+6. For troubleshooting, investigate `output/log.txt`
 
 
 Key Features
@@ -66,11 +73,12 @@ script will have its internet connectivity disabled.
 poisoning (e.g. static arp entries for default gateway). Most home setups 
 don't fall under this category.
 - For now, the user needs to manually specify their geolocation coordinates 
-in `config.json`. This needs to be accurate as an error of .1 degree in 
-longitude or latitiude can cause prayer times to be shifted in some cases by 
+in `config.json`. The longitude and latitude need to be accurate to 0.1 degree 
+in otherwise it can cause prayer times to be shifted in some cases by 
 up to 3 minutes. Note that clocks on mosques follow pre-defined coordinates, 
 and this sometimes varies between clocks too unfortunately (not full 
-standardization).
+standardization). For now, `config.json` is configured for coordinates in 
+Saudi Arabia, AlKhobar.
 
 
 Authors
@@ -80,8 +88,8 @@ Authors
 | Othman Alikhan | oz.alikhan@gmail.com      | 
 
 
-Credits
--------
+Acknowledgements
+----------------
 ##### Individals
 - *AbdulAziz Almass:* For inspiring me to take on this project.
 
@@ -101,3 +109,33 @@ TODO
 - Study how input parameters (e.g. JD, LAT, LON) vary prayer times mathematically.
 - Study domain and range restrictions of formulae
 - Document the findings above in docstrings
+
+- Improve broken instructions above!
+- Remove README.txt
+- Improve aroundtheclock.service
+- Complete install.sh script
+- Add STARTING PROJECT line into source code
+- Maybe add log for installation process!
+- Add more logging perhaps!
+- Add `journalctl -u aroundtheclock.service` to command list
+- Add uninstallation script
+
+
+Project Structure
+-----------------
+- `src/`
+    - `neural.py`, contains the neural network logic.
+    - `test_neural.py`, contains tests for the neural.py module.
+
+- `lib/`
+    - `dominate/`, contains the dominate library for quick HTML tag creation.
+
+
+Motivation
+----------
+
+
+Troubleshooting
+---------------
+Note: See [troubleshooting](#troubleshooting) for common issues and solutions.
+

@@ -1,7 +1,9 @@
 import datetime as dt
 
+from pytest_mock import mocker
 import pytest
 import schedule
+import subprocess
 
 import algorithms
 import prayer
@@ -180,7 +182,32 @@ def testComputeAllPrayerTimes_khobarCity_calculatePrecisely(timings):
 
 
 def testOneTimeJobDecorator_scheduledJob_returnCancelJobWhenDone():
-    printHello = lambda x: print("Hello")
-    scheduledHello = prayer.oneTimeJob(printHello)
-    assert scheduledHello("") == schedule.CancelJob
+    scheduledFunction = prayer.oneTimeJob(lambda x: 0)
+    assert scheduledFunction(0) == schedule.CancelJob
 
+
+def testBlockInternet_startBlocking_executeOSCommands(mocker):
+    mockIPRoute = mocker.Mock(name="ip route")
+    mockIPRoute.stdout = b"""
+    default via 10.0.2.2 dev enp0s3 proto dhcp metric 100 
+    10.0.2.0/24 dev enp0s3 proto kernel scope link src 10.0.2.15 metric 100 
+    169.254.0.0/16 dev enp0s3 scope link metric 1000 
+    """
+
+    mockSubprocess = mocker.patch("subprocess.run", return_value=mockIPRoute)
+    arpPoison = ["sudo", "timeout", "600", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
+    kwargs = {"timeout": 600}
+
+    prayer.blockInternet(10)
+    mockSubprocess.assert_called_with(arpPoison, **kwargs)
+
+
+def testBlockInternet_stopBlocking_returnTimeout(mocker):
+    calls = [mocker.MagicMock(name="ip route"), subprocess.TimeoutExpired("", 0)]
+    mockSubprocess = mocker.patch("subprocess.run", side_effect=calls)
+
+    try:
+        prayer.blockInternet(10)
+        assert mockSubprocess.call_count == 2
+    except subprocess.TimeoutExpired:
+        pytest.fail("TimeoutExpired exception was raised when it shouldn't!")

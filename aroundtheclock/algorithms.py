@@ -101,6 +101,26 @@ def asrEquation(shadowLength, latitude, declination):
 
 ################################################# NUMERICAL FUNCTIONS
 
+def computeDiff(p1, p2):
+    """
+    Calculates the difference between two prayers in minutes.
+
+    :param p1: datetime.datetime, the first prayer.
+    :param p2: datetime.datetime, the second prayer.
+    :return: 3-Tuple, (hours, minutes, seconds)
+    """
+    if p2 > p1:
+        diff = p2 - p1
+    else:
+        diff = p1 - p2
+
+    hours, remainder = divmod(diff.total_seconds(), 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    hours = int(hours)
+    minutes = int(minutes)
+    seconds = int(seconds)
+    return hours, minutes, seconds
 
 # def __guessKhobarCoordinates():
 #     """
@@ -173,23 +193,3 @@ def asrEquation(shadowLength, latitude, declination):
 #     return longitude, latitude, err
 #
 #
-# def computeDiff(p1, p2):
-#     """
-#     Calculates the difference between two prayers in minutes.
-#
-#     :param p1: datetime.datetime, the first prayer.
-#     :param p2: datetime.datetime, the second prayer.
-#     :return: 3-Tuple, (hours, minutes, seconds)
-#     """
-#     if p2 > p1:
-#         diff = p2 - p1
-#     else:
-#         diff = p1 - p2
-#
-#     hours, remainder = divmod(diff.total_seconds(), 3600)
-#     minutes, seconds = divmod(remainder, 60)
-#
-#     hours = int(hours)
-#     minutes = int(minutes)
-#     seconds = int(seconds)
-#     return hours, minutes, seconds

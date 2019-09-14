@@ -7,12 +7,12 @@ that computes the time from when the sun is at its highest point until the
 length of an object's shadow reaches some multiple N. Then, we have the
 formulae below.
 
-    Fajr:    T_fajr    = T_dhuhr - T(ANGLE)
-    Sharooq: T_sharooq = T_dhuhr - T(0.833 + hFactor)
-    Dhuhr:   T_dhuhr   = 12 + Tz - (Lng/15 + Te)
-    Asr:     T_asr     = T_dhuhr + A(MULTIPLIER)
-    Maghrib: T_sunset  = T_dhuhr + T(0.833 + hFactor)
-    Isha:    T_isha    = T_dhuhr + T(ANGLE) (or T_maghrib + 90)
+    Fajr:    T_fajr    = T_thuhr - T(ANGLE)
+    Sharooq: T_sharooq = T_thuhr - T(0.833 + hFactor)
+    Thuhr:   T_thuhr   = 12 + Tz - (Lng/15 + Te)
+    Asr:     T_asr     = T_thuhr + A(MULTIPLIER)
+    Maghrib: T_sunset  = T_thuhr + T(0.833 + hFactor)
+    Isha:    T_isha    = T_thuhr + T(ANGLE) (or T_maghrib + 90)
 
     where
         hFactor = 0.0347 * h^0.5, the height factor

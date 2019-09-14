@@ -1,204 +1,178 @@
 import datetime as dt
-import unittest
 
+import pytest
+
+import algorithms
 import prayer
+
+
+######################################## HELPER FUNCTIONS
+
+FORMAT = "%Y-%m-%d %H:%M"
+
+
+def formatPrayers(prayers):
+    """
+    Convenience function that re-formats prayer times to a format that is
+    easier to use with other functions.
+
+    For example,
+
+    INP: ["2019-01-27", "05:05", "11:53", "14:58", "17:19", "18:49"]
+    OUT: ["2019-01-27 05:05",
+          "2019-01-27 11:53",
+          "2019-01-27 14:58",
+          "2019-01-27 17:19",
+          "2019-01-27 18:49"]
+
+    :param prayers: 6-List, of the form [date, fajr, thuhr, asr, maghrib, isha].
+    :return: 5-List, where each element includes a date and time of the prayer.
+    """
+    d = prayers[0]
+    ps = prayers[1:]
+    return [f"{d} {prayer}" for prayer in ps]
+
+
+def assertAlmostEqualPrayer(p1, p2, err):
+    """
+    Tests whether the two prayer times are almost equal by checking whether
+    they differ by the given amount of minutes.
+
+    :param p1: datetime.datetime, the time of the first prayer.
+    :param p2: datetime.datetime, the time of the second prayer.
+    :param err: Integer, the number of minutes the prayer can deviate.
+    :return: Boolean, true if prayer is in time tolerance otherwise false.
+    """
+    hours, minutes, seconds = algorithms.computeDiff(p1, p2)
+    if abs(60*hours + minutes + seconds/60) > err:
+        pytest.fail("Prayer time differs by {:02d}:{:02d}:{:02d}!\np1: {}\np2: {}"
+                    .format(hours, minutes, seconds, p1, p2))
+
+
+def assertAlmostEqualAllPrayers(prayers, err):
+    """
+    Tests whether the five prayers supplied for the day are almost equal
+    by checking whether they differ by the given amount of minutes.
+
+    Note: The parameters for testing are hardcoded for Khobar city!
+
+    :param prayers: List, containing prayer times as Strings.
+    :param err: Integer, the number of minutes the prayer can deviate.
+    :return: Boolean, true if prayers are in time tolerance otherwise false.
+    """
+    fajr = dt.datetime.strptime(prayers[0], FORMAT)
+    thuhr = dt.datetime.strptime(prayers[1], FORMAT)
+    asr = dt.datetime.strptime(prayers[2], FORMAT)
+    maghrib = dt.datetime.strptime(prayers[3], FORMAT)
+    isha = dt.datetime.strptime(prayers[4], FORMAT)
+
+    date = dt.datetime(fajr.year, fajr.month, fajr.day)
+    fajrIshaConvention = "umm_alqura"
+    asrConvention = "standard"
+    coordinates = (50.0000, 26.6000)
+    timezone = 3
+
+    prayers = prayer.computeAllPrayerTimes(date,
+                                           coordinates,
+                                           timezone,
+                                           fajrIshaConvention,
+                                           asrConvention)
+
+    assertAlmostEqualPrayer(prayers["fajr"], fajr, err)
+    assertAlmostEqualPrayer(prayers["thuhr"], thuhr, err)
+    assertAlmostEqualPrayer(prayers["asr"], asr, err)
+    assertAlmostEqualPrayer(prayers["maghrib"], maghrib, err)
+    assertAlmostEqualPrayer(prayers["isha"], isha, err)
+
+
+######################################## TEST DATA (KHOBAR)
+
+
+mosqueTimings = map(formatPrayers, [
+    ["2019-01-27", "05:05", "11:53", "14:58", "17:19", "18:49"],
+    ["2019-02-07", "05:00", "11:54", "15:05", "17:28", "18:58"],
+    ["2019-02-10", "04:59", "11:54", "15:06", "17:29", "18:59"],
+    ["2019-06-02", "03:15", "11:38", "15:05", "18:29", "19:59"],
+    ["2019-08-10", "03:42", "11:46", "15:16", "18:21", "19:51"]
+])
+
+
+@pytest.fixture
+def kPrayers():
+    prayers = {
+        "fajr": dt.datetime.strptime("2019-02-04 05:01", FORMAT),
+        "thuhr": dt.datetime.strptime("2019-02-04 11:53", FORMAT),
+        "asr": dt.datetime.strptime("2019-02-04 15:02", FORMAT),
+        "maghrib": dt.datetime.strptime("2019-02-04 17:26", FORMAT),
+        "isha": dt.datetime.strptime("2019-02-04 18:29", FORMAT),
+    }
+    return prayers
+
+
+@pytest.fixture
+def kParams():
+    param = {
+        "TZ": 3,
+        "F_ANG": 18.5,
+        "M_ANG": 0.833,
+        "I_ANG": 15.0,
+        "LON": 50.2083,
+        "LAT": 26.2172,
+        "SHA": 1,
+    }
+    return param
 
 
 ######################################## UNIT TESTS
 
 
-class UnitTestPrayerModule(unittest.TestCase):
-
-    def setUp(self):
-        self.FORMAT = "%Y-%m-%d %H:%M"
-
-    def testJulianEquation_standardDate_calculateCorrectly(self):
-        JD = 2458517.5
-        date = dt.datetime(2019, 2, 3)
-        self.assertEqual(JD, prayer._julianEquation(date))
-
-    def testSunEquation_standardValue_calculateCorrectly(self):
-        date = dt.datetime(2019, 1, 1)
-        declination = -23.03993184124207
-        equationOfTime = -0.053431595269049836
-        DEC, EOT = prayer._sunEquation(date)
-        self.assertEqual(DEC, declination, msg="Declination calculations failed!")
-        self.assertEqual(EOT, equationOfTime, msg="EoT calculations failed!")
-
-    def testHorizonEquation_standardValue_calculateCorrectly(self):
-        calculated = dt.timedelta(seconds=33298, microseconds=699809)
-        ANG = 50.5
-        LAT = 26.2172
-        DEC = -16.3741
-        self.assertEqual(calculated, prayer._horizonEquation(ANG, LAT, DEC))
-
-    def testAsrEquation_standardValue_calculateCorrectly(self):
-        calculated = dt.timedelta(seconds=14061, microseconds=155471)
-        SHA = 2
-        LAT = 26.2172
-        DEC = -16.3741
-        self.assertEqual(calculated, prayer._asrEquation(SHA, LAT, DEC))
+def testFormatPrayers_commonCase_mergeDateWithTime():
+    inp = ["2019-01-27", "05:05", "11:53", "14:58", "17:19", "18:49"]
+    exp = ["2019-01-27 05:05",
+           "2019-01-27 11:53",
+           "2019-01-27 14:58",
+           "2019-01-27 17:19",
+           "2019-01-27 18:49"]
+    assert formatPrayers(inp) == exp
 
 
-######################################## INTEGRATION TESTS
+def testComputeFajr_khobarCity_calculateKhobarFajr(kPrayers, kParams):
+    date = dt.datetime(2019, 2, 4)
+    p = prayer.computeFajr(date, kParams["F_ANG"], kParams["LAT"], kPrayers["thuhr"])
+    assertAlmostEqualPrayer(p, kPrayers["fajr"], 3)
 
 
-class IntegrationTestPrayerModule(unittest.TestCase):
+def testComputeThuhr_khobarCity_calculateKhobarThuhr(kPrayers, kParams):
+    date = dt.datetime(2019, 2, 4)
+    p = prayer.computeThuhr(date, kParams["LON"], kParams["TZ"])
+    assertAlmostEqualPrayer(p, kPrayers["thuhr"], 3)
 
-    def setUp(self):
-        self.FORMAT = "%Y-%m-%d %H:%M"
-        self.coordinates = (50.0000, 26.6000)
-        self.timezone = 3
 
-    def testComputeFajr_khobarCity_calculateKhobarFajr(self):
-        fajr = dt.datetime.strptime("2019-02-04 05:01", self.FORMAT)
+def testComputeAsr_khobarCity_calculateKhobarAsr(kPrayers, kParams):
+    date = dt.datetime(2019, 2, 4)
+    p = prayer.computeAsr(date, kParams["SHA"], kParams["LAT"], kPrayers["thuhr"])
+    assertAlmostEqualPrayer(p, kPrayers["asr"], 3)
 
-        ANG = 18.5
-        LAT = 26.2172
-        date = dt.datetime(2019, 2, 4)
-        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        p = prayer.computeFajr(date, ANG, LAT, thuhr)
-        self.assertAlmostEqualPrayer(p, fajr, 3)
 
-    def testComputeThuhr_khobarCity_calculateKhobarThuhr(self):
-        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
+def testComputeMaghrib_khobarCity_calculateKhobarMaghrib(kPrayers, kParams):
+    date = dt.datetime(2019, 2, 4)
+    p = prayer.computeMaghrib(date, kParams["LAT"], kPrayers["thuhr"], angle=kParams["M_ANG"])
+    assertAlmostEqualPrayer(p, kPrayers["maghrib"], 3)
 
-        TZ = 3
-        LON = 50.2083
-        date = dt.datetime(2019, 2, 4)
-        p = prayer.computeThuhr(date, LON, TZ)
-        self.assertAlmostEqualPrayer(p, thuhr, 3)
 
-    def testComputeAsr_khobarCity_calculateKhobarAsr(self):
-        asr = dt.datetime.strptime("2019-02-04 15:02", self.FORMAT)
+def testComputeIshaUmmAlQura_khobarCity_return90MinuteFromMaghrib():
+    isha = dt.datetime.strptime("2019-02-04 18:56", FORMAT)
+    maghrib = dt.datetime.strptime("2019-02-04 17:26", FORMAT)
+    p = prayer.computeIshaUmmAlQura(maghrib)
+    assertAlmostEqualPrayer(p, isha, 0)   # No error acceptable
 
-        LAT = 26.2172
-        shadowLength = 1
-        date = dt.datetime(2019, 2, 4)
-        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        p = prayer.computeAsr(date, shadowLength, LAT, thuhr)
-        self.assertAlmostEqualPrayer(p, asr, 3)
 
-    def testComputeMaghrib_khobarCity_calculateKhobarMaghrib(self):
-        maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
+def testComputeIsha_khobarCity_calculateKhobarIsha(kPrayers, kParams):
+    date = dt.datetime(2019, 2, 4)
+    p = prayer.computeIsha(date, kParams["I_ANG"], kParams["LAT"], kPrayers["thuhr"])
+    assertAlmostEqualPrayer(p, kPrayers["isha"], 3)
 
-        ANG = 0.833
-        LAT = 26.2172
-        date = dt.datetime(2019, 2, 4)
-        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        p = prayer.computeMaghrib(date, LAT, thuhr, angle=ANG)
-        self.assertAlmostEqualPrayer(p, maghrib, 3)
 
-    def testComputeIshaUmmAlQura_khobarCity_return90MinuteFromMaghrib(self):
-        isha = dt.datetime.strptime("2019-02-04 18:56", self.FORMAT)
-
-        maghrib = dt.datetime.strptime("2019-02-04 17:26", self.FORMAT)
-        p = prayer.computeIshaUmmAlQura(maghrib)
-        self.assertAlmostEqualPrayer(p, isha, 0)   # No error acceptable
-
-    def testComputeIsha_khobarCity_calculateKhobarIsha(self):
-        isha = dt.datetime.strptime("2019-02-04 18:29", self.FORMAT)
-
-        ANG = 15.0
-        LAT = 26.2172
-        date = dt.datetime(2019, 2, 4)
-        thuhr = dt.datetime.strptime("2019-02-04 11:53", self.FORMAT)
-        p = prayer.computeIsha(date, ANG, LAT, thuhr)
-        self.assertAlmostEqualPrayer(p, isha, 3)
-
-    def testComputeAllPrayerTimes_khobarCity20190127_calculatePrecisely(self):
-            ps = [
-                "2019-01-27 05:05",
-                "2019-01-27 11:53",
-                "2019-01-27 14:58",
-                "2019-01-27 17:19",
-                "2019-01-27 18:49"
-            ]
-            self.assertAlmostEqualAllPrayers(ps, 2)
-
-    def testComputeAllPrayerTimes_khobarCity20190207_calculatePrecisely(self):
-        ps = [
-            "2019-02-07 05:00",
-            "2019-02-07 11:54",
-            "2019-02-07 15:05",
-            "2019-02-07 17:28",
-            "2019-02-07 18:58"
-        ]
-        self.assertAlmostEqualAllPrayers(ps, 2)
-
-    def testComputeAllPrayerTimes_khobarCity20190210_calculatePrecisely(self):
-        ps = [
-            "2019-02-10 04:59",
-            "2019-02-10 11:54",
-            "2019-02-10 15:06",
-            "2019-02-10 17:29",
-            "2019-02-10 18:59"
-        ]
-        self.assertAlmostEqualAllPrayers(ps, 2)
-
-    def testComputeAllPrayerTimes_khobarCity20190602_calculatePrecisely(self):
-        ps = [
-            "2019-06-02 03:15",
-            "2019-06-02 11:38",
-            "2019-06-02 15:05",
-            "2019-06-02 18:29",
-            "2019-06-02 19:59",
-        ]
-        self.assertAlmostEqualAllPrayers(ps, 1)
-
-    def testComputeAllPrayerTimes_khobarCity20190810_calculatePrecisely(self):
-        ps = [
-            "2019-08-10 03:42",
-            "2019-08-10 11:46",
-            "2019-08-10 15:16",
-            "2019-08-10 18:21",
-            "2019-08-10 19:51",
-        ]
-        self.assertAlmostEqualAllPrayers(ps, 1)
-
-    def assertAlmostEqualAllPrayers(self, prayers, err):
-        """
-        Tests whether the five prayers supplied for the day are almost equal
-        by checking whether they differ by the given amount of minutes.
-
-        :param prayers: List, containing prayer times as Strings.
-        :param err: Integer, the number of minutes the prayer can deviate.
-        :return: Boolean, true if prayers are in time tolerance otherwise false.
-        """
-        fajr = dt.datetime.strptime(prayers[0], self.FORMAT)
-        thuhr = dt.datetime.strptime(prayers[1], self.FORMAT)
-        asr = dt.datetime.strptime(prayers[2], self.FORMAT)
-        maghrib = dt.datetime.strptime(prayers[3], self.FORMAT)
-        isha = dt.datetime.strptime(prayers[4], self.FORMAT)
-
-        date = dt.datetime(fajr.year, fajr.month, fajr.day)
-        fajrIshaConvention = "umm_alqura"
-        asrConvention = "standard"
-
-        prayers = prayer.computeAllPrayerTimes(date,
-                                               self.coordinates,
-                                               self.timezone,
-                                               fajrIshaConvention,
-                                               asrConvention)
-
-        self.assertAlmostEqualPrayer(prayers["fajr"], fajr, err)
-        self.assertAlmostEqualPrayer(prayers["thuhr"], thuhr, err)
-        self.assertAlmostEqualPrayer(prayers["asr"], asr, err)
-        self.assertAlmostEqualPrayer(prayers["maghrib"], maghrib, err)
-        self.assertAlmostEqualPrayer(prayers["isha"], isha, err)
-
-    def assertAlmostEqualPrayer(self, p1, p2, err):
-        """
-        Tests whether the two prayer times are almost equal by checking whether
-        they differ by the given amount of minutes.
-
-        :param p1: datetime.datetime, the time of the first prayer.
-        :param p2: datetime.datetime, the time of the second prayer.
-        :param err: Integer, the number of minutes the prayer can deviate.
-        :return: Boolean, true if prayer is in time tolerance otherwise false.
-        """
-        hours, minutes, seconds = prayer.computeDiff(p1, p2)
-        if abs(60*hours + minutes + seconds/60) > err:
-            self.fail("Prayer time differs by {:02d}:{:02d}:{:02d}!\np1: {}\np2: {}"
-                      .format(hours, minutes, seconds, p1, p2))
-
+@pytest.mark.parametrize("timings", [t for t in mosqueTimings])
+def testComputeAllPrayerTimes_khobarCity_calculatePrecisely(timings):
+    assertAlmostEqualAllPrayers(timings, 2)

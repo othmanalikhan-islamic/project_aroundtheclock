@@ -26,6 +26,10 @@ PATH_DST=/lib/systemd/system/aroundtheclock.service
 sudo cp $PATH_SRC $PATH_DST
 sudo sed -i "s|<PATH_TO_PROJECT_ROOT>|$(pwd)|g" $PATH_DST
 
-echo -e "\n>>> CHANGING PERMISSIONS ON AROUNDTHECLOCK RUN SCRIPT..."
-chown aroundtheclock:aroundtheclock run.sh
-chmod u+x run.sh
+echo -e "\n>>> CHANGING PERMISSIONS ON AROUNDTHECLOCK PROJECT..."
+sudo chown -R aroundtheclock:aroundtheclock .
+sudo chmod u+x run.sh
+
+echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."
+sudo systemctl enable aroundtheclock.service
+sudo systemctl restart aroundtheclock.service

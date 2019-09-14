@@ -116,7 +116,7 @@ def writePrayerTimes(prayers, PATH_OUT):
 
     prayers = [(p, t.strftime(DATETIME_FORMAT)) for p, t in prayers.items()]
     prayers = OrderedDict(prayers)
-    with open(str(PATH_OUT), 'w') as f:
+    with open(PATH_OUT.as_posix(), 'w') as f:
         json.dump(prayers, f, indent=4)
 
 
@@ -329,11 +329,11 @@ if __name__ == "__main__":
             CONFIG = json.load(f)
 
         # Creating output directory
-        PATH_OUT = Path(PATH_ROOT, "output")
+        PATH_OUT = Path(CONFIG["path"]["output"])
         PATH_OUT.mkdir(parents=True, exist_ok=True)
 
         # Initialising logging
-        logging.config.fileConfig(fname=CONFIG["path"]["log"], disable_existing_loggers=False)
+        logging.config.fileConfig(fname=CONFIG["path"]["logging.ini"], disable_existing_loggers=False)
         logger = logging.getLogger(__name__)
         logger.info("Starting project AroundTheClock!")
         main(CONFIG)

@@ -50,9 +50,16 @@ How to Use
 
 Troubleshooting
 ---------------
-5. Use `systemctl status supervisor` and/or navigate to `output/` for more details.
-4. Run `run.sh` to start the script and enable it at boot time.
-6. For troubleshooting, investigate `output/log.txt`
+- Issue: How do check if aroundtheclock is running?
+- Solution: Check its daemon, `systemctl status aroundtheclock.service`.
+
+- Issue: I get the error 'Unit aroundtheclock.service could not be found'!
+- Solution: The installation process failed. Re-run the installation script, `./install.sh`.
+
+- Issue: I can see aroundtheclock service but its state isn't 'active'!
+- Solution A: Restart the service manually, `systemctl restart aroundtheclock.service`.
+- Solution B: Check the logs of the service, `journalctl -u aroundtheclock.service`.
+- Solution C: Check the logs of the application, `output/log.txt`.
 
 
 Key Features
@@ -109,33 +116,4 @@ TODO
 - Study how input parameters (e.g. JD, LAT, LON) vary prayer times mathematically.
 - Study domain and range restrictions of formulae
 - Document the findings above in docstrings
-
-- Improve broken instructions above!
-- Remove README.txt
-- Improve aroundtheclock.service
-- Complete install.sh script
-- Add STARTING PROJECT line into source code
-- Maybe add log for installation process!
-- Add more logging perhaps!
-- Add `journalctl -u aroundtheclock.service` to command list
-- Add uninstallation script
-
-
-Project Structure
------------------
-- `src/`
-    - `neural.py`, contains the neural network logic.
-    - `test_neural.py`, contains tests for the neural.py module.
-
-- `lib/`
-    - `dominate/`, contains the dominate library for quick HTML tag creation.
-
-
-Motivation
-----------
-
-
-Troubleshooting
----------------
-Note: See [troubleshooting](#troubleshooting) for common issues and solutions.
-
+- Add an uninstall script

@@ -57,14 +57,7 @@ def oneTimeJob(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         func(*args, **kwargs)
-
-        # Log when next job is occurring
-        try:
-            schedule.cancel_job(schedule.jobs[0])
-            logging.info("Next job at {}.".format(schedule.default_scheduler.next_run))
-        except Exception:
-            pass    # Try or die trying...
-
+        logging.info("Next job at {}.".format(schedule.default_scheduler.next_run))
         return schedule.CancelJob
     return wrapper
 

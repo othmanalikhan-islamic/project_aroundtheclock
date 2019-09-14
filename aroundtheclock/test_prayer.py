@@ -1,6 +1,7 @@
 import datetime as dt
 
 import pytest
+import schedule
 
 import algorithms
 import prayer
@@ -176,3 +177,10 @@ def testComputeIsha_khobarCity_calculateKhobarIsha(kPrayers, kParams):
 @pytest.mark.parametrize("timings", [t for t in mosqueTimings])
 def testComputeAllPrayerTimes_khobarCity_calculatePrecisely(timings):
     assertAlmostEqualAllPrayers(timings, 2)
+
+
+def testOneTimeJobDecorator_scheduledJob_returnCancelJobWhenDone():
+    printHello = lambda x: print("Hello")
+    scheduledHello = prayer.oneTimeJob(printHello)
+    assert scheduledHello("") == schedule.CancelJob
+

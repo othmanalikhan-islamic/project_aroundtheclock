@@ -50,16 +50,19 @@ How to Use
 
 Troubleshooting
 ---------------
-- Issue: How do check if aroundtheclock is running?
-- Solution: Check its daemon, `systemctl status aroundtheclock.service`.
+- **Issue:** How do check if aroundtheclock is running?
+- **Solution:** Check its daemon, `systemctl status aroundtheclock.service`.
+<br>
 
-- Issue: I get the error 'Unit aroundtheclock.service could not be found'!
-- Solution: The installation process failed. Re-run the installation script, `./install.sh`.
+- **Issue:** I get the error 'Unit aroundtheclock.service could not be found'!
+- **Solution:** The installation process failed. Re-run the installation script, `./install.sh`.
+<br>
 
-- Issue: I can see aroundtheclock service but its state isn't 'active'!
-- Solution A: Restart the service manually, `systemctl restart aroundtheclock.service`.
-- Solution B: Check the logs of the service, `journalctl -u aroundtheclock.service`.
-- Solution C: Check the logs of the application, `output/log.txt`.
+- **Issue:** I can see aroundtheclock service but its state isn't 'active'!
+- **Solution A:** Restart the service manually, `systemctl restart aroundtheclock.service`.
+- **Solution B:** Check the logs of the service, `journalctl -u aroundtheclock.service`.
+- **Solution C:** Check the logs of the application, `output/log.txt`.
+<br>
 
 
 Key Features

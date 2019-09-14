@@ -1,10 +1,10 @@
 import datetime as dt
 from collections import OrderedDict
 
-from pytest_mock import mocker
 import pytest
 import schedule
 import subprocess
+from pytest_mock import mocker
 
 import algorithms
 import prayer
@@ -218,7 +218,7 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
     mockOpen = mocker.mock_open()
     _ = mocker.patch("prayer.open", mockOpen)
     mockJSON = mocker.patch("prayer.json")
-    ps = OrderedDict({k: v.strftime("%H:%M") for k, v in kPrayers.items()})
+    out = OrderedDict({k: v.strftime("%H:%M") for k, v in kPrayers.items()})
 
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
-    mockJSON.dump.assert_called_with(ps, mockOpen(), **{"indent": 4})
+    mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})

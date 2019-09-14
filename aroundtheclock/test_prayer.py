@@ -30,7 +30,7 @@ def formatPrayers(prayers):
     """
     d = prayers[0]
     ps = prayers[1:]
-    return [f"{d} {prayer}" for prayer in ps]
+    return ["{} {}".format(d, prayer) for prayer in ps]
 
 
 def assertAlmostEqualPrayer(p1, p2, err):

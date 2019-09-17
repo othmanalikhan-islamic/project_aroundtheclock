@@ -215,10 +215,12 @@ def testBlockInternet_stopBlocking_returnTimeout(mocker):
 
 
 def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
+    PRAYERS = ["fajr", "thuhr", "asr", "maghrib", "isha"]
     mockOpen = mocker.mock_open()
     _ = mocker.patch("prayer.open", mockOpen)
     mockJSON = mocker.patch("prayer.json")
-    out = OrderedDict({k: v.strftime("%H:%M") for k, v in kPrayers.items()})
+    unordered = {k: v.strftime("%H:%M") for k, v in kPrayers.items()}
+    out = OrderedDict({p: unordered[p] for p in PRAYERS})
 
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})

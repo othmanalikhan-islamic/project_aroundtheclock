@@ -53,42 +53,6 @@ def assertAlmostEqualPrayer(p1, p2, err):
                     .format(hours, minutes, seconds, p1, p2))
 
 
-def assertAlmostEqualAllPrayers(prayers, err):
-    """
-    Tests whether the five prayers supplied for the day are almost equal
-    by checking whether they differ by the given amount of minutes.
-
-    Note: The parameters for testing are hardcoded for Khobar city!
-
-    :param prayers: List, containing prayer times as Strings.
-    :param err: Integer, the number of minutes the prayer can deviate.
-    :return: Boolean, true if prayers are in time tolerance otherwise false.
-    """
-    fajr = dt.datetime.strptime(prayers[0], FORMAT)
-    thuhr = dt.datetime.strptime(prayers[1], FORMAT)
-    asr = dt.datetime.strptime(prayers[2], FORMAT)
-    maghrib = dt.datetime.strptime(prayers[3], FORMAT)
-    isha = dt.datetime.strptime(prayers[4], FORMAT)
-
-    date = dt.datetime(fajr.year, fajr.month, fajr.day)
-    fajrIshaConvention = "umm_alqura"
-    asrConvention = "standard"
-    coordinates = (50.0000, 26.6000)
-    timezone = 3
-
-    prayers = prayer.computeAllPrayerTimes(date,
-                                           coordinates,
-                                           timezone,
-                                           fajrIshaConvention,
-                                           asrConvention)
-
-    assertAlmostEqualPrayer(prayers["fajr"], fajr, err)
-    assertAlmostEqualPrayer(prayers["thuhr"], thuhr, err)
-    assertAlmostEqualPrayer(prayers["asr"], asr, err)
-    assertAlmostEqualPrayer(prayers["maghrib"], maghrib, err)
-    assertAlmostEqualPrayer(prayers["isha"], isha, err)
-
-
 ######################################## TEST DATA (KHOBAR)
 
 
@@ -179,7 +143,21 @@ def testComputeIsha_khobarCity_calculateKhobarIsha(kPrayers, kParams):
 
 @pytest.mark.parametrize("timings", [t for t in mosqueTimings])
 def testComputeAllPrayerTimes_khobarCity_calculatePrecisely(timings):
-    assertAlmostEqualAllPrayers(timings, 2)
+    timings = [dt.datetime.strptime(t, FORMAT) for t in timings]
+    date = dt.datetime(timings[0].year, timings[0].month, timings[0].day)
+    fajrIshaConvention = "umm_alqura"
+    asrConvention = "standard"
+    coordinates = (50.0000, 26.6000)
+    timezone = 3
+
+    prayers = prayer.computeAllPrayerTimes(date,
+                                           coordinates,
+                                           timezone,
+                                           fajrIshaConvention,
+                                           asrConvention)
+
+    for p1, p2 in zip(prayers.values(), timings):
+        assertAlmostEqualPrayer(p1, p2, 2)
 
 
 def testOneTimeJobDecorator_scheduledJob_returnCancelJobWhenDone():
@@ -224,3 +202,4 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
 
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})
+

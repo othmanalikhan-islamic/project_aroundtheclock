@@ -40,7 +40,6 @@ import schedule
 
 PATH_ROOT = Path(__file__, "../../").absolute().resolve()
 
-
 ################################################# DECORATORS
 
 
@@ -258,21 +257,23 @@ def computeIshaUmmAlQura(maghrib):
 ################################################# RUNNING SCRIPT
 
 
-def main(CONFIG):
+def main():
     """
     Runs the script.
-
-    :param CONFIG: Dictionary, containing JSON data of config.json.
     """
-    ######################################## INITIALISING VARIABLES
+    # Reading config file
+    PATH_CONFIG = Path(PATH_ROOT, "config.json").absolute().resolve()
+    with open(str(PATH_CONFIG), "r") as f:
+        CONFIG = json.load(f)
 
-    longitude, latitude = float(CONFIG["longitude"]), float(CONFIG["latitude"])
-    coord = (longitude, latitude)
-    timezone = int(CONFIG["timezone"])
-    fajrIshaConv = CONFIG["fajr_isha"]
-    asrConv = CONFIG["asr"]
-    PATH_JSON = Path(CONFIG["path"]["prayer"])
-    blockMapping = CONFIG["block"]
+    # Creating output directory
+    PATH_OUT = Path(CONFIG["path"]["output"])
+    PATH_OUT.mkdir(parents=True, exist_ok=True)
+
+    # Initialising logging
+    logging.config.fileConfig(fname=CONFIG["path"]["logging.ini"], disable_existing_loggers=False)
+    logger = logging.getLogger(__name__)
+    logger.info("Starting project AroundTheClock!")
 
     ######################################## SCHEDULING
 
@@ -289,13 +290,18 @@ def main(CONFIG):
             logging.info("Computing today's prayer times {}!".format(dt.date.today()))
             t = dt.date.today()
             date = dt.datetime(t.year, t.month, t.day)
-            prayers = computeAllPrayerTimes(date, coord, timezone, fajrIshaConv, asrConv)
+            prayers = computeAllPrayerTimes(date,
+                                            (float(CONFIG["longitude"]),
+                                             float(CONFIG["latitude"])),
+                                            int(CONFIG["timezone"]),
+                                            CONFIG["fajr_isha"],
+                                            CONFIG["asr"])
 
             # Logging prayer times computed
             ps = ["{}: {}".format(p, t.strftime(FORMAT_PRINT)) for p, t in prayers.items()]
             timings = ", ".join(ps)
             logging.info("Prayer times generated: {}.".format(timings))
-            writePrayerTimes(prayers, PATH_JSON)
+            writePrayerTimes(prayers, Path(CONFIG["path"]["prayer"]))
             printAllPrayerTimes(prayers)
 
             # Scheduling prayer block times as jobs
@@ -305,7 +311,7 @@ def main(CONFIG):
             # more than 2 minutes.
             for p, t in prayers.items():
                 t = t.strftime(FORMAT_SCHEDULE)
-                duration = blockMapping[p]
+                duration = CONFIG["block"][p]
                 schedule.every().day.at(t).do(blockInternet, duration)
 
             # Logging scheduled jobs
@@ -316,20 +322,6 @@ def main(CONFIG):
 
 if __name__ == "__main__":
     try:
-        # Reading config file
-        PATH_CONFIG = Path(PATH_ROOT, "config.json").absolute().resolve()
-        with open(str(PATH_CONFIG), "r") as f:
-            CONFIG = json.load(f)
-
-        # Creating output directory
-        PATH_OUT = Path(CONFIG["path"]["output"])
-        PATH_OUT.mkdir(parents=True, exist_ok=True)
-
-        # Initialising logging
-        logging.config.fileConfig(fname=CONFIG["path"]["logging.ini"], disable_existing_loggers=False)
-        logger = logging.getLogger(__name__)
-        logger.info("Starting project AroundTheClock!")
-        main(CONFIG)
-
+        main()
     except Exception as e:
-        logging.exception("An unexpected error has occured!")
+        logging.exception("An unexpected error has occurred!")

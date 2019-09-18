@@ -53,6 +53,9 @@ def assertAlmostEqualPrayer(p1, p2, err):
                     .format(hours, minutes, seconds, p1, p2))
 
 
+class EndOfTestException(Exception):
+    """Used in mock objects to halt code execution"""
+
 ######################################## TEST DATA (KHOBAR)
 
 
@@ -203,3 +206,20 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})
 
+
+######################################## INTEGRAITON TESTS
+
+def testMain_configFileRead_readFileCalled(mocker):
+    mockOpen = mocker.mock_open()
+    _ = mocker.patch("prayer.open", mockOpen)
+    mockJSON = mocker.patch("prayer.json")
+    mockJSON.load.side_effect = EndOfTestException
+
+    with pytest.raises(EndOfTestException):
+        prayer.main()
+        assert mockJSON.load.call_count == 1
+
+    # mockMkdir.mkdir.assert_any_call()
+    # mockMkdir = mocker.patch("prayer.Path")
+    # mockMkdir.return_value = mockMkdir
+    # _ = mocker.patch("prayer.time", side_effect=exit())

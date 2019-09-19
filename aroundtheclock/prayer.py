@@ -263,7 +263,7 @@ def main():
     """
     # Reading config file
     PATH_CONFIG = Path(PATH_ROOT, "config.json").absolute().resolve()
-    with open(str(PATH_CONFIG), "r") as f:
+    with open(PATH_CONFIG.as_posix(), "r") as f:
         CONFIG = json.load(f)
 
     # Creating output directory
@@ -271,7 +271,7 @@ def main():
     PATH_OUT.mkdir(parents=True, exist_ok=True)
 
     # Initialising logging
-    logging.config.fileConfig(fname=CONFIG["path"]["logging.ini"], disable_existing_loggers=False)
+    logging.config.fileConfig(fname=CONFIG["path"]["logging"], disable_existing_loggers=False)
     logger = logging.getLogger(__name__)
     logger.info("Starting project AroundTheClock!")
 
@@ -287,7 +287,7 @@ def main():
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
 
             # Computing prayer times
-            logging.info("Computing today's prayer times {}!".format(dt.date.today()))
+            logger.info("Computing today's prayer times {}!".format(dt.date.today()))
             t = dt.date.today()
             date = dt.datetime(t.year, t.month, t.day)
             prayers = computeAllPrayerTimes(date,
@@ -300,7 +300,7 @@ def main():
             # Logging prayer times computed
             ps = ["{}: {}".format(p, t.strftime(FORMAT_PRINT)) for p, t in prayers.items()]
             timings = ", ".join(ps)
-            logging.info("Prayer times generated: {}.".format(timings))
+            logger.info("Prayer times generated: {}.".format(timings))
             writePrayerTimes(prayers, Path(CONFIG["path"]["prayer"]))
             printAllPrayerTimes(prayers)
 
@@ -316,8 +316,8 @@ def main():
 
             # Logging scheduled jobs
             for j in schedule.jobs:
-                logging.info("Job scheduled: {}.".format(j))
-            logging.info("Next job at {}.".format(schedule.default_scheduler.next_run))
+                logger.info("Job scheduled: {}.".format(j))
+            logger.info("Next job at {}.".format(schedule.default_scheduler.next_run))
 
 
 if __name__ == "__main__":

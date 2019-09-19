@@ -62,7 +62,6 @@ Troubleshooting
 - **Solution A:** Restart the service manually, `systemctl restart aroundtheclock.service`.
 - **Solution B:** Check the logs of the service, `journalctl -u aroundtheclock.service`.
 - **Solution C:** Check the logs of the application, `output/log.txt`.
-<br>
 
 
 Key Features
@@ -120,3 +119,4 @@ TODO
 - Study domain and range restrictions of formulae
 - Document the findings above in docstrings
 - Add an uninstall script
+- Add tests for deployment

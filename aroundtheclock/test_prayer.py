@@ -70,13 +70,13 @@ mosqueTimings = map(formatPrayers, [
 
 @pytest.fixture
 def kPrayers():
-    prayers = {
+    prayers = OrderedDict({
         "fajr": dt.datetime.strptime("2019-02-04 05:01", FORMAT),
         "thuhr": dt.datetime.strptime("2019-02-04 11:53", FORMAT),
         "asr": dt.datetime.strptime("2019-02-04 15:02", FORMAT),
         "maghrib": dt.datetime.strptime("2019-02-04 17:26", FORMAT),
         "isha": dt.datetime.strptime("2019-02-04 18:29", FORMAT),
-    }
+    })
     return prayers
 
 
@@ -207,7 +207,7 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})
 
 
-######################################## INTEGRAITON TESTS
+######################################## INTEGRATION TESTS
 
 def testMain_configFileRead_readFileCalled(mocker):
     mockOpen = mocker.mock_open()
@@ -217,9 +217,37 @@ def testMain_configFileRead_readFileCalled(mocker):
 
     with pytest.raises(EndOfTestException):
         prayer.main()
-        assert mockJSON.load.call_count == 1
+    assert mockJSON.load.call_count == 1
 
-    # mockMkdir.mkdir.assert_any_call()
-    # mockMkdir = mocker.patch("prayer.Path")
-    # mockMkdir.return_value = mockMkdir
-    # _ = mocker.patch("prayer.time", side_effect=exit())
+
+def testMain_createOutputDirectory_OSInvoked(mocker):
+    mockMkdir = mocker.patch("prayer.Path.mkdir")
+    mockMkdir.side_effect = EndOfTestException
+
+    with pytest.raises(EndOfTestException):
+        prayer.main()
+    assert mockMkdir.call_count == 1
+
+
+def testMain_scheduleNewPrayerTimes_scheduledAndWaiting(mocker):
+    def branchIfElse(*args, **kwargs):
+        mockSchedule.default_scheduler.next_run = True
+
+    times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
+
+    _ = mocker.patch("logging.getLogger")
+    _ = mocker.patch("sys.stdout")
+
+    mockSchedule = mocker.patch("prayer.schedule")
+    mockSchedule.default_scheduler.next_run = False
+    mockSchedule.run_pending.side_effect = EndOfTestException
+    mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
+
+    mockDate = mocker.patch("prayer.dt.date")
+    mockDate.today.return_value = dt.datetime(2019, 1, 27)
+
+    with pytest.raises(EndOfTestException):
+        prayer.main()
+    [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
+    assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
+    assert mockSchedule.run_pending.call_count == 1

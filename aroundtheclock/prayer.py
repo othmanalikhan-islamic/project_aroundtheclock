@@ -262,7 +262,7 @@ def main():
     Runs the script.
     """
     # Reading config file
-    PATH_CONFIG = Path(PATH_ROOT, "config.json").absolute().resolve()
+    PATH_CONFIG = Path(PATH_ROOT, "config/config.json").absolute().resolve()
     with open(PATH_CONFIG.as_posix(), "r") as f:
         CONFIG = json.load(f)
 

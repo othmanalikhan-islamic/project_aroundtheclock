@@ -32,7 +32,7 @@ internet is 'paused'. For the purposes of the demo, the the script and clock
 are manually controlled, however, in a real-world scenario is is fully automated.
 
 This is achieved by calculating the prayer times for the geolocation 
-specified in `config.json` then scheduling tasks in Python to disable the 
+specified in `config/config.json` then scheduling tasks in Python to disable the 
 home internet. 
 
 The idea is to download this repository on an Raspberry Pi device (or any 
@@ -43,9 +43,9 @@ How to Use
 ----------
 1. Clone the repository, `git clone https://github.com/OthmanEmpire/project_aroundtheclock`
 2. Navigate to the root project directory, `cd project_aroundtheclock`
-3. Modify `config.json` to your geolocation, `vi config.json`
-4. Change permissions of the installation script, `chmod u+x install.sh`
-5. Run the installation script, `./install.sh`.
+3. Modify `./config/config.json` to your geolocation, `vi ./config/config.json`
+4. Change permissions of the installation script, `chmod u+x ./bin/install.sh`
+5. Run the installation script **from the root directory**, `./bin/install.sh`.
 
 
 Troubleshooting
@@ -55,7 +55,7 @@ Troubleshooting
 <br>
 
 - **Issue:** I get the error 'Unit aroundtheclock.service could not be found'!
-- **Solution:** The installation process failed. Re-run the installation script, `./install.sh`.
+- **Solution:** The installation process failed. Repeat [steps 4-5][#how-to-use].
 <br>
 
 - **Issue:** I can see aroundtheclock service but its state isn't 'active'!
@@ -68,7 +68,7 @@ Key Features
 ------------
 - Calculates individual prayer times up to an accuracy of 1 minute.
 - Schedules jobs to block the internet temporarily for all prayers.
-- Configurable duration of block via `config.json`.
+- Configurable internet blocking duration via `config.json`.
 - Logs computed prayer times as well as scheduled jobs to blocking internet.
 - Source code is structured via a functional approach (thus can verify formulae).
 

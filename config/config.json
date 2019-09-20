@@ -15,7 +15,7 @@
 
   "path" : {
     "output": "output",
-    "logging": "logging.ini",
+    "logging": "config/logging.ini",
     "prayer": "output/prayer.json"
   }
 }

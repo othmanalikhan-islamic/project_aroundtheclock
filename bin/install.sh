@@ -21,7 +21,7 @@ echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
 sudo useradd -r aroundtheclock -s /bin/false
 
 echo -e "\n>>> INSTALLING AROUNDTHECLOCK AS A DAEMON..."
-PATH_SRC=./aroundtheclock.service
+PATH_SRC=./config/aroundtheclock.service
 PATH_DST=/lib/systemd/system/aroundtheclock.service
 sudo cp $PATH_SRC $PATH_DST
 sudo sed -i "s|<PATH_TO_PROJECT_ROOT>|$(pwd)|g" $PATH_DST

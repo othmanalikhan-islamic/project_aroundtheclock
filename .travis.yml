@@ -11,10 +11,5 @@ install:
 script:
     - pytest --cov=./
 
-
-branches:
-    only:
-        - master
-
 after_success: 
     - codecov

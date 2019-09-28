@@ -24,7 +24,6 @@ jobs:
         - ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - dpkg -s dsniff
         - which pip
         - pip list
       script: bats ./test/test_deployment.sh

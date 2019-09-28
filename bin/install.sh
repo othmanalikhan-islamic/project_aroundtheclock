@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e "\n>>> INSTALLING OS DEPENDENCIES..."
 while read -r dependency; do
-  yes | sudo apt install $dependency
+  yes | sudo apt-get install $dependency
 done < requirements_linux.txt
 
 echo -e "\n>>> CREATING A PYTHON VIRTUAL ENVIRONMENT AND INSTALLING ITS DEPENDENCIES..."

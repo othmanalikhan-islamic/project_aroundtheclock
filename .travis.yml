@@ -6,6 +6,7 @@ python:
   - "3.6"
   - "3.7"
 os: "linux"
+dist: "bionic"
 
 install:
   - pip install -r requirements_python.txt

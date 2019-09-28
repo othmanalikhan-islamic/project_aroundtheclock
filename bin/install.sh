@@ -24,4 +24,4 @@ sudo chmod u+x run.sh
 
 echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."
 sudo systemctl enable aroundtheclock.service
-sudo systemctl restart aroundtheclock.service
+sudo systemctl start aroundtheclock.service

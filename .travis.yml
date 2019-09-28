@@ -1,3 +1,4 @@
+dist: "bionic"
 language: python
 
 ### JOBS THAT ARE ASSIGNED TO DEFAULT 'TEST' STAGE.
@@ -5,8 +6,6 @@ language: python
 python:
   - "3.6"
   - "3.7"
-os: "linux"
-dist: "bionic"
 
 install:
   - pip install -r requirements_python.txt
@@ -21,11 +20,13 @@ jobs:
     - stage: "Deploy"
       python: "3.7"
       os: "linux"
-      before_install:
+      install:
         - ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - alias python3=python
+        - dpkg -s dsniff
+        - which pip
+        - pip list
       script: bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION

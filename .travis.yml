@@ -1,10 +1,9 @@
-language: python
-
-
 matrix:
   include:
+  - python:
+    - "3.6"
+    - "3.7"
   - stage: "Source code testing"
-    python: "3.6"
     install:
       - pip install -r requirements_python.txt
       - pip install -r test/requirements_test_python.txt
@@ -16,9 +15,9 @@ matrix:
       - ./bin/install.sh
       - ./test/requirements_test_linux.sh
     before_script:
-      - chmod +x bin/install.sh
-      - chmod +x test/requirements_test_linux.sh
-      - chmod +x test/test_deployment.sh
+      - chmod u+x bin/install.sh
+      - chmod u+x test/requirements_test_linux.sh
+      - chmod u+x test/test_deployment.sh
     script: ./test/test_deployment.sh
 
 notifications:

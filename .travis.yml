@@ -11,12 +11,14 @@ install:
 script: pytest --cov=test/
 after_success: codecov
 
+# Job to test deployment
+
 jobs:
   include:
-    - stage: "Deployment"
+    - stage: "Deploy"
       python: "3.7"
       os: "linux"
-      install:
+      before_install:
         - ./bin/install.sh
         - ./test/requirements_test_linux.sh
       script: bats ./test/test_deployment.sh

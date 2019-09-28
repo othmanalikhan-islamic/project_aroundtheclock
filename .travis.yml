@@ -5,22 +5,23 @@ matrix:
   - python: "3.6"
     os: "linux"
 
-  - stage: "Source code testing"
-    install:
-      - pip install -r requirements_python.txt
-      - pip install -r test/requirements_test_python.txt
-    script: pytest --cov=test/
-    after_success: codecov
 
-  - stage: "Deployment"
-    install:
-      - ./bin/install.sh
-      - ./test/requirements_test_linux.sh
-    before_script:
-      - chmod u+x bin/install.sh
-      - chmod u+x test/requirements_test_linux.sh
-      - chmod u+x test/test_deployment.sh
-    script: ./test/test_deployment.sh
+- stage: "Source code testing"
+  install:
+    - pip install -r requirements_python.txt
+    - pip install -r test/requirements_test_python.txt
+  script: pytest --cov=test/
+  after_success: codecov
+
+- stage: "Deployment"
+  install:
+    - ./bin/install.sh
+    - ./test/requirements_test_linux.sh
+  before_script:
+    - chmod u+x bin/install.sh
+    - chmod u+x test/requirements_test_linux.sh
+    - chmod u+x test/test_deployment.sh
+  script: ./test/test_deployment.sh
 
 notifications:
   email:

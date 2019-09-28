@@ -3,7 +3,7 @@ language: python
 jobs:
   include:
     - stage: "Unit/Integration tests"
-    - python:
+      python:
         - "3.6"
         - "3.7"
       install:

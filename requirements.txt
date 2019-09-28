@@ -1,4 +1,0 @@
-julian==0.14
-schedule==0.6.0
-pytest
-pytest-mock==1.10.4

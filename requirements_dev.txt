@@ -1,0 +1,8 @@
+# Python
+pytest
+pytest-mock==1.10.4
+
+# Linux
+# git clone https://github.com/sstephenson/bats.git
+# cd bats
+# ./install.sh /usr/local

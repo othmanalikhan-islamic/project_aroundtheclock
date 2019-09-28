@@ -1,21 +1,13 @@
 #!/bin/bash
-echo -e "\n>>> INSTALLING PYTHON3..."
-yes | sudo apt install python3
+echo -e "\n>>> INSTALLING OS DEPENDENCIES..."
+while read -r dependency; do
+  yes | sudo apt install $dependency
+done < requirements_linux.txt
 
-echo -e "\n>>> INSTALLING PYTHON PIP3..."
-yes | sudo apt install python3-pip
-
-echo -e "\n>>> INSTALLING PYTHON VIRTUAL ENVIRONMENT PACKAGE..."
-yes | sudo apt install python3-venv
-
-echo -e "\n>>> CREATING A PYTHON VIRTUAL ENVIRONMENT AND INSTALLING DEPENDENCIES..."
+echo -e "\n>>> CREATING A PYTHON VIRTUAL ENVIRONMENT AND INSTALLING ITS DEPENDENCIES..."
 python3 -m venv virtual
 source ./virtual/bin/activate
-yes | pip3 install -r requirements.txt
-mkdir output
-
-echo -e "\n>>> INSTALLING 'DSNIFF' DEPENDENCY..."
-yes | sudo apt install dsniff             # To block internet via 'arpspoof' module
+yes | pip3 install -r requirements_python.txt
 
 echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
 sudo useradd -r aroundtheclock -s /bin/false

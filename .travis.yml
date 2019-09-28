@@ -13,9 +13,9 @@ matrix:
 
   - stage: "Deployment"
     before_install:
-      - chmod u+x bin/install.sh
-      - chmod u+x test/requirements_test_linux.sh
-      - chmod u+x test/test_deployment.sh
+      - chmod +x bin/install.sh
+      - chmod +x test/requirements_test_linux.sh
+      - chmod +x test/test_deployment.sh
     install:
       - ./bin/install.sh
       - ./test/requirements_test_linux.sh

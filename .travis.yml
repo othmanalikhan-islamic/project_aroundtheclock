@@ -1,8 +1,10 @@
+language: python
+
 matrix:
   include:
-  - python:
-    - "3.6"
-    - "3.7"
+  - python: "3.6"
+    os: "linux"
+
   - stage: "Source code testing"
     install:
       - pip install -r requirements_python.txt

@@ -13,7 +13,7 @@ jobs:
       after_success: codecov
     - stage: "Deployment"
       install:
-        - ./bin/install.sh
+        - chmod u+x /bin/install.sh && ./bin/install.sh
         - ./test/install_linux_requirements.sh
       script: ./test/test_deployment.sh
 

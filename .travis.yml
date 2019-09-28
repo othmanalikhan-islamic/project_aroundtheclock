@@ -1,5 +1,7 @@
 language: python
 
+### JOBS THAT ARE ASSIGNED TO DEFAULT 'TEST' STAGE.
+
 python:
   - "3.6"
   - "3.7"
@@ -7,11 +9,11 @@ os: "linux"
 
 install:
   - pip install -r requirements_python.txt
-  - pip install -r test/requirements_test_python.txt
+  - pip install -r test/requirements_python.txt
 script: pytest --cov=test/
 after_success: codecov
 
-# Job to test deployment
+### JOBS THAT ARE ASSIGNED TO 'Deploy' STAGE.
 
 jobs:
   include:
@@ -20,8 +22,10 @@ jobs:
       os: "linux"
       before_install:
         - ./bin/install.sh
-        - ./test/requirements_test_linux.sh
+        - ./test/requirements_linux.sh
       script: bats ./test/test_deployment.sh
+
+### EXTRA CONFIGURATION
 
 notifications:
   email:

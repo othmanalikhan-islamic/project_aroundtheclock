@@ -8,7 +8,7 @@ matrix:
     install:
       - pip install -r requirements_python.txt
       - pip install -r test/requirements_test_python.txt
-    script: pytest --cov
+    script: pytest --cov=test/
     after_success: codecov
 
   - stage: "Deployment"

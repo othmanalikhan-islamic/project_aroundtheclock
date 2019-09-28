@@ -3,7 +3,7 @@ language: python
 
 matrix:
   include:
-  - stage: "Unit/Integration tests"
+  - stage: "Source code testing"
     python: "3.6"
     install:
       - pip install -r requirements_python.txt
@@ -13,9 +13,9 @@ matrix:
 
   - stage: "Deployment"
     before_install:
-      - chmod u+x ./bin/install.sh
-      - chmod u+x ./test/requirements_test_linux.sh
-      - chmod u+x ./test/test_deployment.sh
+      - chmod u+x bin/install.sh
+      - chmod u+x test/requirements_test_linux.sh
+      - chmod u+x test/test_deployment.sh
     install:
       - ./bin/install.sh
       - ./test/requirements_test_linux.sh

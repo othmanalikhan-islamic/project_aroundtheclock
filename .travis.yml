@@ -23,6 +23,8 @@ jobs:
       before_install:
         - ./bin/install.sh
         - ./test/requirements_linux.sh
+      before_script:
+        - alias python3=python
       script: bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION

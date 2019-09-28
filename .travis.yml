@@ -12,13 +12,13 @@ matrix:
     after_success: codecov
 
   - stage: "Deployment"
-    before_install:
-      - chmod +x bin/install.sh
-      - chmod +x test/requirements_test_linux.sh
-      - chmod +x test/test_deployment.sh
     install:
       - ./bin/install.sh
       - ./test/requirements_test_linux.sh
+    before_script:
+      - chmod +x bin/install.sh
+      - chmod +x test/requirements_test_linux.sh
+      - chmod +x test/test_deployment.sh
     script: ./test/test_deployment.sh
 
 notifications:

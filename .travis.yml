@@ -2,10 +2,10 @@ language: python
 
 jobs:
   include:
-    - python:
-      - "3.6"
-      - "3.7"
     - stage: "Unit/Integration tests"
+    - python:
+        - "3.6"
+        - "3.7"
       install:
         - pip install -r requirements_python.txt
         - pip install -r test/requirements_test_python.txt

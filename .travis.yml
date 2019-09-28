@@ -21,10 +21,6 @@ jobs:
     install:
       - ./bin/install.sh
       - ./test/requirements_test_linux.sh
-    before_script:
-      - chmod u+x bin/install.sh
-      - chmod u+x test/requirements_test_linux.sh
-      - chmod u+x test/test_deployment.sh
     script: ./test/test_deployment.sh
 
 notifications:

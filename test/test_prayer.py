@@ -1,14 +1,13 @@
 import datetime as dt
+import subprocess
 from collections import OrderedDict
 
 import pytest
 import schedule
-import subprocess
-from pytest_mock import mocker
 
+import setup_test_paths
 import algorithms
 import prayer
-
 
 ######################################## HELPER FUNCTIONS
 

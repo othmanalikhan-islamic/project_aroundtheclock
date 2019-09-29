@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 @test "Check python3 installed" {
   run dpkg -s python3 &> /dev/null
   [ "$status" -eq 0 ]

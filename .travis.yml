@@ -25,10 +25,10 @@ jobs:
       install:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
-      script: bats ./test/test_deployment.sh
-      after_script:
-        - systemctl status aroundtheclock.service
+      script:
+        - bats ./test/test_deployment.sh
         - journalctl -u aroundtheclock.service
+        - systemctl status aroundtheclock.service
 
 ### EXTRA CONFIGURATION
 

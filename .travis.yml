@@ -23,10 +23,12 @@ jobs:
       before_install:
         - sudo apt-get update
       install:
-        - ./bin/install.sh
+        - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       script: bats ./test/test_deployment.sh
-      after_script: systemctl status aroundtheclock.service
+      after_script:
+        - systemctl status aroundtheclock.service
+        - journalctl -u aroundtheclock.service
 
 ### EXTRA CONFIGURATION
 

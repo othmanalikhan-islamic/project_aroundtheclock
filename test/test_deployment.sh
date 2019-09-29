@@ -1,10 +1,13 @@
 #!/bin/bash
 
 
-@test "Check python3 dependency installed" {
+@test "Check python3 installed" {
   run dpkg -s python3 &> /dev/null
   [ "$status" -eq 0 ]
+}
 
+
+@test "Check python3 dependencies installed" {
   run dpkg -s python3-pip &> /dev/null
   [ "$status" -eq 0 ]
 
@@ -13,7 +16,7 @@
 }
 
 
-@test "Check network library dependency installed" {
+@test "Check OS network library installed" {
   run dpkg -s dsniff &> /dev/null
   [ "$status" -eq 0 ]
 }

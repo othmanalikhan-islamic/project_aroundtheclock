@@ -20,12 +20,11 @@ jobs:
     - stage: "Deploy"
       python: "3.7"
       os: "linux"
+      before_install:
+        - sudo apt-get update
       install:
         - ./bin/install.sh
         - ./test/requirements_linux.sh
-      before_script:
-        - which pip
-        - pip list
       script: bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION

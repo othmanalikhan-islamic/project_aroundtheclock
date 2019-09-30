@@ -27,8 +27,10 @@ jobs:
         - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
-        - sudo journalctl -u aroundtheclock.service
-        - systemctl status aroundtheclock.service
+        - journalctl -u aroundtheclock.service
+        - sudo systemctl restart aroundtheclock.service
+        - sleep 10
+        - sudo systemctl status aroundtheclock.service
 
 ### EXTRA CONFIGURATION
 

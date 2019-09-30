@@ -30,7 +30,7 @@ jobs:
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
         - sleep 10
-        - sudo systemctl status aroundtheclock.service
+        - sudo systemctl -l status aroundtheclock.service
 
 ### EXTRA CONFIGURATION
 

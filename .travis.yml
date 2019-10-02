@@ -30,10 +30,11 @@ jobs:
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
         - sudo systemctl status
+        - sudo systemctl restart cron.service
         - date
         - sleep 10
         - date
-        - sudo systemctl -l status crond.service
+        - sudo systemctl -l status cron.service
         - sudo systemctl -l status aroundtheclock.service
 
 ### EXTRA CONFIGURATION

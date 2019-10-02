@@ -30,7 +30,8 @@ jobs:
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
         - cat /lib/systemd/system/aroundtheclock.service
-        - ls /home/travis/build/OthmanEmpire/project_aroundtheclock/**
+        - python3 project_aroundtheclock/prayer.py
+        - ls ~/project_aroundtheclock/**
         - sudo systemctl -l status aroundtheclock.service
 
 ### EXTRA CONFIGURATION

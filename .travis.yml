@@ -29,7 +29,11 @@ jobs:
         - bats ./test/test_deployment.sh
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
+        - sudo systemctl restart firewalld.service
+        - date
         - sleep 10
+        - date
+        - sudo systemctl -l status firewalld.service
         - sudo systemctl -l status aroundtheclock.service
 
 ### EXTRA CONFIGURATION

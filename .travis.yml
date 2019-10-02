@@ -29,7 +29,7 @@ jobs:
         - bats ./test/test_deployment.sh
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
-        - sudo systemctl restart crond.service
+        - sudo systemctl status
         - date
         - sleep 10
         - date

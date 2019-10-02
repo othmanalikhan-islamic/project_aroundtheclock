@@ -29,8 +29,8 @@ jobs:
         - bats ./test/test_deployment.sh
         - journalctl -u aroundtheclock.service
         - sudo systemctl restart aroundtheclock.service
-        - sudo systemctl status
         - cat /lib/systemd/system/aroundtheclock.service
+        - cat /home/travis/build/OthmanEmpire/project_aroundtheclock/output/*
         - sudo systemctl -l status aroundtheclock.service
 
 ### EXTRA CONFIGURATION

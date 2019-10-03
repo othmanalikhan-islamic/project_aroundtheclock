@@ -25,12 +25,12 @@ jobs:
       install:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
+      before_script:
+        - sudo ./bin/install.sh
+        - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
-        - journalctl -u aroundtheclock.service
-        - sudo systemctl restart aroundtheclock.service
-        - cat /lib/systemd/system/aroundtheclock.service
-        - python ~/build/OthmanEmpire/project_aroundtheclock/aroundtheclock/prayer.py
+        - sudo ./bin/run.sh
         - ls ~/build/OthmanEmpire/project_aroundtheclock/**
         - sudo systemctl -l status aroundtheclock.service
 

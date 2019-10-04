@@ -30,9 +30,8 @@ jobs:
         - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
-        - sudo ./bin/run.sh &
         - sudo systemctl -l status aroundtheclock.service
-        - sudo systemctl list-units --all --type=service --no-pager
+        - sudo journalctl -u aroundtheclock.service
         - ls ~/build/OthmanEmpire/project_aroundtheclock/**
 
 ### EXTRA CONFIGURATION

@@ -1,13 +1,13 @@
 #!/bin/bash
 echo -e "\n>>> INSTALLING OS DEPENDENCIES..."
 while read -r dependency; do
-  yes | sudo apt-get install $dependency
+  sudo apt-get install -y $dependency
 done < requirements_linux.txt
 
 echo -e "\n>>> CREATING A PYTHON VIRTUAL ENVIRONMENT AND INSTALLING ITS DEPENDENCIES..."
 python3 -m venv virtual
 source ./virtual/bin/activate
-yes | pip3 install -r requirements_python.txt
+yes | pip install -r requirements_python.txt
 
 echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
 sudo useradd -r aroundtheclock -s /bin/false

@@ -45,7 +45,7 @@ How to Use
 2. Navigate to the root project directory, `cd project_aroundtheclock`
 3. Modify `./config/config.json` to your geolocation, `vi ./config/config.json`
 4. Change permissions of the installation script, `chmod u+x ./bin/install.sh`
-5. Run the installation script **from the root directory**, `./bin/install.sh`.
+5. Run the installation script **from the root directory**, `sudo ./bin/install.sh`.
 
 
 Troubleshooting

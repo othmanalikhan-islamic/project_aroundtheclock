@@ -28,7 +28,6 @@ jobs:
       before_script:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
-        - getfacl ./bin/run.sh
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

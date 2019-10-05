@@ -3,7 +3,7 @@ Description=Project_AroundTheClock
 After=multi-user.target
 
 [Service]
-ExecStart=/tmp/test.sh
+ExecStart=bash /tmp/test.sh
 WorkingDirectory=<PATH_TO_PROJECT_ROOT>
 Type=idle
 User=travis

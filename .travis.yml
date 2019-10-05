@@ -26,8 +26,8 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - sudo chmod o+rx /home/travis
-        - sudo chown -R aroundtheclock:aroundtheclock /home/travis
+        - sudo chmod -R o+rwx /home/travis
+#        - sudo chown -R aroundtheclock:aroundtheclock /home/travis
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

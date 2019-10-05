@@ -26,11 +26,9 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - sudo ./bin/install.sh
-        - ./test/requirements_linux.sh
         - sudo chmod o+rx /home/travis
-        - sudo cat "echo 'GG'" > /home/test.sh
-        - chmod a+rwx /home/test.sh
+        - sudo bash echo 'GG' > /tmp/test.sh
+        - chmod a+rwx /tmp/test.sh
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service
@@ -38,7 +36,7 @@ jobs:
         - ls -ld / /home /home/travis /home/travis/build /home/travis/build/OthmanEmpire
         - ls -ld /home/travis/build/OthmanEmpire/project_aroundtheclock
         - ls -ld /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
-        - ls -ld /home/travis/build/OthmanEmpire/project_aroundtheclock/bin/run.sh
+        - ls -ld /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
 
 ### EXTRA CONFIGURATION
 

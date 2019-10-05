@@ -1,3 +1,4 @@
 #!/bin/bash
-source virtual/bin/activate
-python aroundtheclock/prayer.py
+echo "HELLO WORLD!"
+#source virtual/bin/activate
+#python aroundtheclock/prayer.py

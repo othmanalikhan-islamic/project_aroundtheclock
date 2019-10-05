@@ -26,6 +26,7 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
+        - ls -ld / /home /home/travis /home/travis/build /home/travis/build/OthmanEmpire /home/travis/build/OthmanEmpire/project_aroundtheclock /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
         - sudo chmod o+rx /home/travis
       script:
         - bats ./test/test_deployment.sh

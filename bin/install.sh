@@ -19,9 +19,8 @@ sudo cp $PATH_SRC $PATH_DST
 sudo sed -i "s|<PATH_TO_PROJECT_ROOT>|$(pwd)|g" $PATH_DST
 
 echo -e "\n>>> CHANGING PERMISSIONS ON AROUNDTHECLOCK PROJECT..."
-sudo chmod 777 -R .
 #sudo chown -R aroundtheclock:aroundtheclock .
-sudo chmod u+x bin/run.sh
+sudo chmod a+x bin/run.sh
 
 echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."
 sudo systemctl enable aroundtheclock.service

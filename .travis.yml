@@ -34,6 +34,7 @@ jobs:
         - sudo journalctl -u aroundtheclock.service
         - ls -nd ./bin/
         - ls -nd ./bin/*
+        - sudo cat /etc/passwd
 
 ### EXTRA CONFIGURATION
 

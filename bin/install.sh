@@ -10,7 +10,7 @@ source ./virtual/bin/activate
 yes | pip install -r requirements_python.txt
 
 echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
-sudo useradd -r aroundtheclock -s /bin/false
+sudo useradd -r aroundtheclock -s /bin/bash # TODO: CHANGE
 
 echo -e "\n>>> INSTALLING AROUNDTHECLOCK AS A DAEMON..."
 PATH_SRC=./config/aroundtheclock.service

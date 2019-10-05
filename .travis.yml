@@ -28,8 +28,8 @@ jobs:
       before_script:
         - sudo chmod a+rwx /home/travis
         - sudo chmod -R a+rwx /home/travis/*
-        - sudo chmod -R a+rwx .travis*
-        - sudo chmod -R a+rwx .profile .bash* .config
+        - sudo chmod -R a+rwx /home/travis/.travis*
+        - sudo chmod -R a+rwx /home/travis/{.profile,.bash*,.config}
         - sudo ls -la /home/travis
       script:
         - bats ./test/test_deployment.sh

@@ -26,8 +26,10 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - sudo chmod o+rwx /home/travis
-        - sudo chmod -R o+rwx /home/travis/*
+        - sudo chmod a+rwx /home/travis
+        - sudo chmod -R a+rwx /home/travis/*
+        - sudo chmod -R a+rwx .travis*
+        - sudo chmod -R a+rwx .profile .bash* .config
         - sudo ls -la /home/travis
       script:
         - bats ./test/test_deployment.sh

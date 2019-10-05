@@ -35,6 +35,7 @@ jobs:
         - ls -nd ./bin/
         - ls -nd ./bin/*
         - sudo cat /etc/passwd
+        - sudo cat ./bin/run.sh
 
 ### EXTRA CONFIGURATION
 

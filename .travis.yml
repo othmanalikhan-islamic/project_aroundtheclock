@@ -27,7 +27,7 @@ jobs:
         - ./test/requirements_linux.sh
       before_script:
         - sudo chmod -R o+rwx /home/travis
-        - sudo ll /home/travis
+        - sudo ls -l /home/travis
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

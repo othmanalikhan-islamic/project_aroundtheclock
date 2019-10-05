@@ -31,6 +31,9 @@ jobs:
         - sudo chmod -R o+rwx /home/travis/bin
         - sudo chmod -R o+rwx /home/travis/build
         - sudo chmod -R o+rwx /home/travis/builds
+        - sudo chmod -R o+rwx /home/travis/build.sh
+        - sudo chmod -R o+rwx /home/travis/gopath
+        - sudo chmod -R o+rwx /home/travis/perl5
         - sudo chmod -R o+rwx /home/travis/virtualenv
         - sudo ls -l /home/travis
       script:

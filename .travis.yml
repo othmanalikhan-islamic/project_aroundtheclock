@@ -27,7 +27,10 @@ jobs:
         - ./test/requirements_linux.sh
       before_script:
         - sudo chmod o+rwx /home/travis
+        - sudo chmod -R o+rwx /home/travis/bats
+        - sudo chmod -R o+rwx /home/travis/bin
         - sudo chmod -R o+rwx /home/travis/build
+        - sudo chmod -R o+rwx /home/travis/builds
         - sudo chmod -R o+rwx /home/travis/virtualenv
         - sudo ls -l /home/travis
       script:

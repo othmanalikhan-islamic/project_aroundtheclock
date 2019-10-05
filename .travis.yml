@@ -33,6 +33,7 @@ jobs:
         - sudo systemctl -l status aroundtheclock.service
         - sudo journalctl -u aroundtheclock.service
         - ls -l /home/travis/build/OthmanEmpire/project_aroundtheclock/bin/*
+        - sudo systemctl show aroundtheclock.service
 
 ### EXTRA CONFIGURATION
 

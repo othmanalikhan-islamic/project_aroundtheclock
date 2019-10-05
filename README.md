@@ -121,3 +121,9 @@ TODO
 - Add an uninstall script
 - Add tests for deployment
 
+Roadnap
+-------
+- Add to template
+- GUI to control config
+- LED for feedback
+- Advanced ARPing

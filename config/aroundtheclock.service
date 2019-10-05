@@ -6,7 +6,7 @@ After=multi-user.target
 ExecStart=/tmp/test.sh
 WorkingDirectory=<PATH_TO_PROJECT_ROOT>
 Type=idle
-User=aroundtheclock
+User=travis
 Restart=always
 RestartSec=3
 

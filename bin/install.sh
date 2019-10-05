@@ -10,7 +10,7 @@ source ./virtual/bin/activate
 yes | pip install -r requirements_python.txt
 
 echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
-sudo useradd -r aroundtheclock -s /bin/bash # TODO: CHANGE
+sudo useradd -r aroundtheclock -s /bin/false
 
 echo -e "\n>>> INSTALLING AROUNDTHECLOCK AS A DAEMON..."
 PATH_SRC=./config/aroundtheclock.service
@@ -20,6 +20,7 @@ sudo sed -i "s|<PATH_TO_PROJECT_ROOT>|$(pwd)|g" $PATH_DST
 
 echo -e "\n>>> CHANGING PERMISSIONS ON AROUNDTHECLOCK PROJECT..."
 sudo chown -R aroundtheclock:aroundtheclock .
+sudo chmod 777 -R bin/ aroundtheclock/
 sudo chmod u+x bin/run.sh
 
 echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."

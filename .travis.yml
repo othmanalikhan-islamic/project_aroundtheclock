@@ -27,6 +27,16 @@ jobs:
         - ./test/requirements_linux.sh
       before_script:
         - sudo chmod o+rx /home/travis
+        - sudo su - root
+        - su - aroundtheclock
+        - cd /
+        - cd /home
+        - cd /home/travis
+        - cd /home/travis/build /home/travis/build/OthmanEmpire
+        - cd /home/travis/build/OthmanEmpire
+        - cd /home/travis/build/OthmanEmpire/project_aroundtheclock
+        - cd /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
+        - ./home/travis/build/OthmanEmpire/project_aroundtheclock/bin/run.sh &
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

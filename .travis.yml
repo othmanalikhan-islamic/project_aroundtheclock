@@ -69,10 +69,10 @@ jobs:
         - sudo chmod a+rwx -R /home/travis/builds
         - sudo chmod a+rwx -R /home/travis/.bash_profile.d
         - sudo chmod a+rwx -R /home/travis/.travis
-        - sudo chmod a+rwx -R /home/travisgopath
-        - sudo chmod a+rwx -R /home/travisperl5
-        - sudo chmod a+rwx -R /home/travisbats
-        - sudo chmod a+rwx -R /home/travisbuild
+        - sudo chmod a+rwx -R /home/travis/gopath
+        - sudo chmod a+rwx -R /home/travis/perl5
+        - sudo chmod a+rwx -R /home/travis/bats
+        - sudo chmod a+rwx -R /home/travis/build
         - sudo chmod a+rwx -R /home/travis/.config
         - sudo chmod a+rwx -R /home/travis/virtualenv
         - sudo chmod a+rwx -R /home/travis/.bash_logout

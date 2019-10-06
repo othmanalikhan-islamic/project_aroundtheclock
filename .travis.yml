@@ -36,14 +36,10 @@ jobs:
         - sudo chmod a+rwx /home/travis/.travis_ci_environment.yml
         - sudo chmod a+rwx /home/travis/.travis_packer_templates_rspec.json
         - sudo chmod a+rwx /home/travis/build.sh
-        - sudo chmod a+rwx -R /home/travis/.cache
-        - sudo chmod a+rwx -R /home/travis/.local
         - sudo chmod a+rwx -R /home/travis/bin
         - sudo chmod a+rwx -R /home/travis/builds
-        - sudo chmod a+rwx -R /home/travis/.travis
         - sudo chmod a+rwx -R /home/travis/bats
         - sudo chmod a+rwx -R /home/travis/build
-        - sudo chmod a+rwx -R /home/travis/.config
         - sudo chmod a+rwx -R /home/travis/virtualenv
         - sudo ls -la /home/travis
       script:

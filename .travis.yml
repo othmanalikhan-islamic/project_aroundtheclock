@@ -33,8 +33,8 @@ jobs:
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
         - sudo chmod a+rwx -R /home/travis/build
-        - sudo chmod a+rwx -R /home/travis
         - sudo ls -la /home/travis
+        - sudo chmod a+rwx -R /home/travis
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

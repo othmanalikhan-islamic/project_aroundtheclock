@@ -29,9 +29,6 @@ jobs:
         - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
-        - sudo systemctl -l status aroundtheclock.service
-        - sudo journalctl -u aroundtheclock.service
-        - namei -mo /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
 
 ### EXTRA CONFIGURATION
 

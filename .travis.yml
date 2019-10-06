@@ -41,6 +41,7 @@ jobs:
         - sudo chmod a+rwx -R /home/travis/.cache
         - sudo chmod a+rwx -R /home/travis/.local
         - sudo chmod a+rwx -R /home/travis/bin
+        - sudo chmod a+rwx -R /home/travis/builds
         - sudo chmod a+rwx -R /home/travis/bats
         - sudo chmod a+rwx -R /home/travis/build
         - sudo chmod a+rwx -R /home/travis/virtualenv

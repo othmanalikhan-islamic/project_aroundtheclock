@@ -26,6 +26,9 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
+        - sudo chmod a+rwx -R /home/travis/builds
+        - sudo chmod a+rwx -R /home/travis/bats
+        - sudo chmod a+rwx -R /home/travis/bin
         - echo "MONKEY!"
         - sudo chmod -R a+rwx /home/travis/{.profile,.config}
         - sudo chmod a+rwx /home/

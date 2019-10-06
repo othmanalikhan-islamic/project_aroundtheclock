@@ -22,10 +22,6 @@ jobs:
       os: "linux"
       before_install:
         - sudo apt-get update
-      install:
-        - sudo ./bin/install.sh
-        - ./test/requirements_linux.sh
-      before_script:
         - sudo chmod a+rwx -R /home/travis/.rvm
         - sudo chmod a+rwx -R /home/travis/virtualenv
         - echo "MONKEY!"
@@ -35,6 +31,9 @@ jobs:
         - sudo chmod a+rwx -R /home/travis/build
         - sudo ls -la /home/travis
         - sudo chmod a+rwx -R /home/travis
+      install:
+        - sudo ./bin/install.sh
+        - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

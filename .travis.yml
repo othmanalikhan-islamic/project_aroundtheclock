@@ -23,10 +23,9 @@ jobs:
       before_install:
         - sudo apt-get update
         - namei -mo /home/travis/build/OthmanEmpire/project_aroundtheclock/bin
-        - sudo ls -la /home/travis
-        - sudo chmod a+rwx /home/
-        - sudo chmod a+rwx /home/travis
-        - sudo chmod a+rwx -R /home/travis/build
+#        - sudo chmod a+rwx /home/
+#        - sudo chmod a+rwx /home/travis
+        - sudo chmod a+rwx -R /home/travis/build/OthmanEmpire
       install:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh

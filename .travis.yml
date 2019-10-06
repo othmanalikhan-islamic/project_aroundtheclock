@@ -27,6 +27,10 @@ jobs:
         - ./test/requirements_linux.sh
       before_script:
         - sudo ls -la /home/travis
+        - sudo chmod a+rwx -R /home/travis/gopath
+        - sudo chmod a+rwx -R /home/travis/perl5
+        - sudo chmod a+rwx -R /home/travis/.npm
+        - sudo chmod a+rwx -R /home/travis/.rvm
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
         - sudo chmod -R a+rwx /home/travis/.travis*

@@ -22,11 +22,9 @@ jobs:
       os: "linux"
       before_install:
         - sudo apt-get update
-        - sudo chmod a+rwx -R /home/travis/virtualenv
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
         - sudo chmod a+rwx -R /home/travis/build
-        - sudo ls -la /home/travis
       install:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh

@@ -31,6 +31,7 @@ jobs:
         - sudo chmod o+rwx -R /home/travis/virtualenv
         - sudo chmod -R o+rwx /home/travis/.config
         - echo "MONKEY!"
+        - sudo chmod o+rwx /home/
         - sudo chmod o+rwx /home/travis
         - sudo chmod o+rwx -R /home/travis/build
       script:

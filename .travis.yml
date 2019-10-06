@@ -30,6 +30,51 @@ jobs:
         - sudo chmod -R a+rwx /home/travis/*
         - sudo chmod -R a+rwx /home/travis/.travis*
         - sudo chmod -R a+rwx /home/travis/{.profile,.bash*,.config}
+        - chmod a+rwx .erlang.cookie
+        - chmod a+rwx .viminfo
+        - chmod a+rwx .gemrc
+        - chmod a+rwx .gitconfig
+        - chmod a+rwx .my.cnf
+        - chmod a+rwx .mkshrc
+        - chmod a+rwx .zlogin
+        - chmod a+rwx .zshrc
+        - chmod a+rwx .rvmrc
+        - chmod a+rwx .bzr.log
+        - chmod a+rwx .travis_ci_environment.yml
+        - chmod a+rwx .bash_profile
+        - chmod a+rwx .bashrc
+        - chmod a+rwx .profile
+        - chmod a+rwx build.sh
+        - chmod a+rwx .travis_packer_templates_rspec.json
+        - chmod a+rwx -R .ssh
+        - chmod a+rwx -R .mozilla
+        - chmod a+rwx -R .gnupg
+        - chmod a+rwx -R .cache
+        - chmod a+rwx -R .m2
+        - chmod a+rwx -R .gimme
+        - chmod a+rwx -R .nvm
+        - chmod a+rwx -R .packer.d
+        - chmod a+rwx -R .bazaar
+        - chmod a+rwx -R .ccache
+        - chmod a+rwx -R .gem
+        - chmod a+rwx -R .local
+        - chmod a+rwx -R .lein
+        - chmod a+rwx -R .subversion
+        - chmod a+rwx -R .npm
+        - chmod a+rwx -R .phpenv
+        - chmod a+rwx -R .rvm
+        - chmod a+rwx -R .yarn
+        - chmod a+rwx -R bin
+        - chmod a+rwx -R builds
+        - chmod a+rwx -R .bash_profile.d
+        - chmod a+rwx -R .travis
+        - chmod a+rwx -R gopath
+        - chmod a+rwx -R perl5
+        - chmod a+rwx -R bats
+        - chmod a+rwx -R build
+        - chmod a+rwx -R .config
+        - chmod a+rwx -R virtualenv
+        - chmod a+rwx -R .bash_logout
         - sudo ls -la /home/travis
       script:
         - bats ./test/test_deployment.sh

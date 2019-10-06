@@ -26,14 +26,14 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       before_script:
-        - sudo ls -la /home/travis
         - sudo chmod a+rwx -R /home/travis/.rvm
-        - sudo chmod -R a+rwx /home/travis/.config
         - sudo chmod a+rwx -R /home/travis/virtualenv
-        - echo "MONKEY!!"
+        - echo "MONKEY!"
+        - sudo chmod a+rwx -R /home/travis/.config
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
         - sudo chmod a+rwx -R /home/travis/build
+        - sudo ls -la /home/travis
       script:
         - bats ./test/test_deployment.sh
         - sudo systemctl -l status aroundtheclock.service

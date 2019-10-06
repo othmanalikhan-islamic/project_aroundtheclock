@@ -22,10 +22,7 @@ jobs:
       os: "linux"
       before_install:
         - sudo apt-get update
-        - sudo chmod a+rwx -R /home/travis/.rvm
         - sudo chmod a+rwx -R /home/travis/virtualenv
-        - echo "MONKEY!"
-        - sudo chmod a+rwx -R /home/travis/.config
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
         - sudo chmod a+rwx -R /home/travis/build

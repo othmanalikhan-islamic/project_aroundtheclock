@@ -29,9 +29,14 @@ jobs:
         - sudo ls -la /home/travis
         - sudo chmod a+rwx /home/
         - sudo chmod a+rwx /home/travis
-        - sudo chmod a+rwx /home/travis/build.sh
-        - sudo chmod a+rwx -R /home/travis/.cache
-        - sudo chmod a+rwx -R /home/travis/.local
+        - sudo chmod -R a+rwx /home/travis/.travis*
+        - sudo chmod a+rwx /home/travis/.bash_profile
+        - sudo chmod a+rwx -R /home/travis/.bash_profile.d
+        - sudo chmod a+rwx /home/travis/.bashrc
+        - sudo chmod a+rwx -R /home/travis/.config
+        - sudo chmod a+rwx /home/travis/.gitconfig
+        - sudo chmod a+rwx /home/travis/.my.cnf
+        - sudo chmod a+rwx /home/travis/.profile
         - sudo chmod a+rwx -R /home/travis/bin
         - sudo chmod a+rwx -R /home/travis/builds
         - sudo chmod a+rwx -R /home/travis/bats

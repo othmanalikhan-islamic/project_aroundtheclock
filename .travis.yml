@@ -30,51 +30,51 @@ jobs:
         - sudo chmod -R a+rwx /home/travis/*
         - sudo chmod -R a+rwx /home/travis/.travis*
         - sudo chmod -R a+rwx /home/travis/{.profile,.bash*,.config}
-        - chmod a+rwx .erlang.cookie
-        - chmod a+rwx .viminfo
-        - chmod a+rwx .gemrc
-        - chmod a+rwx .gitconfig
-        - chmod a+rwx .my.cnf
-        - chmod a+rwx .mkshrc
-        - chmod a+rwx .zlogin
-        - chmod a+rwx .zshrc
-        - chmod a+rwx .rvmrc
-        - chmod a+rwx .bzr.log
-        - chmod a+rwx .travis_ci_environment.yml
-        - chmod a+rwx .bash_profile
-        - chmod a+rwx .bashrc
-        - chmod a+rwx .profile
-        - chmod a+rwx build.sh
-        - chmod a+rwx .travis_packer_templates_rspec.json
-        - chmod a+rwx -R .ssh
-        - chmod a+rwx -R .mozilla
-        - chmod a+rwx -R .gnupg
-        - chmod a+rwx -R .cache
-        - chmod a+rwx -R .m2
-        - chmod a+rwx -R .gimme
-        - chmod a+rwx -R .nvm
-        - chmod a+rwx -R .packer.d
-        - chmod a+rwx -R .bazaar
-        - chmod a+rwx -R .ccache
-        - chmod a+rwx -R .gem
-        - chmod a+rwx -R .local
-        - chmod a+rwx -R .lein
-        - chmod a+rwx -R .subversion
-        - chmod a+rwx -R .npm
-        - chmod a+rwx -R .phpenv
-        - chmod a+rwx -R .rvm
-        - chmod a+rwx -R .yarn
-        - chmod a+rwx -R bin
-        - chmod a+rwx -R builds
-        - chmod a+rwx -R .bash_profile.d
-        - chmod a+rwx -R .travis
-        - chmod a+rwx -R gopath
-        - chmod a+rwx -R perl5
-        - chmod a+rwx -R bats
-        - chmod a+rwx -R build
-        - chmod a+rwx -R .config
-        - chmod a+rwx -R virtualenv
-        - chmod a+rwx -R .bash_logout
+        - sudo chmod a+rwx /home/travis/.erlang.cookie
+        - sudo chmod a+rwx /home/travis/.viminfo
+        - sudo chmod a+rwx /home/travis/.gemrc
+        - sudo chmod a+rwx /home/travis/.gitconfig
+        - sudo chmod a+rwx /home/travis/.my.cnf
+        - sudo chmod a+rwx /home/travis/.mkshrc
+        - sudo chmod a+rwx /home/travis/.zlogin
+        - sudo chmod a+rwx /home/travis/.zshrc
+        - sudo chmod a+rwx /home/travis/.rvmrc
+        - sudo chmod a+rwx /home/travis/.bzr.log
+        - sudo chmod a+rwx /home/travis/.travis_ci_environment.yml
+        - sudo chmod a+rwx /home/travis/.bash_profile
+        - sudo chmod a+rwx /home/travis/.bashrc
+        - sudo chmod a+rwx /home/travis/.profile
+        - sudo chmod a+rwx build/home/travis/.sh
+        - sudo chmod a+rwx /home/travis/.travis_packer_templates_rspec.json
+        - sudo chmod a+rwx -R /home/travis/.ssh
+        - sudo chmod a+rwx -R /home/travis/.mozilla
+        - sudo chmod a+rwx -R /home/travis/.gnupg
+        - sudo chmod a+rwx -R /home/travis/.cache
+        - sudo chmod a+rwx -R /home/travis/.m2
+        - sudo chmod a+rwx -R /home/travis/.gimme
+        - sudo chmod a+rwx -R /home/travis/.nvm
+        - sudo chmod a+rwx -R /home/travis/.packer.d
+        - sudo chmod a+rwx -R /home/travis/.bazaar
+        - sudo chmod a+rwx -R /home/travis/.ccache
+        - sudo chmod a+rwx -R /home/travis/.gem
+        - sudo chmod a+rwx -R /home/travis/.local
+        - sudo chmod a+rwx -R /home/travis/.lein
+        - sudo chmod a+rwx -R /home/travis/.subversion
+        - sudo chmod a+rwx -R /home/travis/.npm
+        - sudo chmod a+rwx -R /home/travis/.phpenv
+        - sudo chmod a+rwx -R /home/travis/.rvm
+        - sudo chmod a+rwx -R /home/travis/.yarn
+        - sudo chmod a+rwx -R home/travis/bin
+        - sudo chmod a+rwx -R home/travis/builds
+        - sudo chmod a+rwx -R /home/travis/.bash_profile.d
+        - sudo chmod a+rwx -R /home/travis/.travis
+        - sudo chmod a+rwx -R /home/travisgopath
+        - sudo chmod a+rwx -R /home/travisperl5
+        - sudo chmod a+rwx -R /home/travisbats
+        - sudo chmod a+rwx -R /home/travisbuild
+        - sudo chmod a+rwx -R /home/travis/.config
+        - sudo chmod a+rwx -R /home/travis/virtualenv
+        - sudo chmod a+rwx -R /home/travis/.bash_logout
         - sudo ls -la /home/travis
       script:
         - bats ./test/test_deployment.sh

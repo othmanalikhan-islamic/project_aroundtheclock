@@ -118,12 +118,11 @@ TODO
 - Study how input parameters (e.g. JD, LAT, LON) vary prayer times mathematically.
 - Study domain and range restrictions of formulae
 - Document the findings above in docstrings
-- Add an uninstall script
-- Add tests for deployment
 
-Roadnap
+Roadmap
 -------
-- Add to template
-- GUI to control config
-- LED for feedback
-- Advanced ARPing
+1. LED for feedback
+2. Automatic initial setting up of config file
+3. GUI to control config
+4. Advanced ARPing
+5. Add an uninstall script

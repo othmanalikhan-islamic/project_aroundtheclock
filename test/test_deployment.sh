@@ -39,7 +39,7 @@
 
 
 @test "Check aroundtheclock.service config file exists" {
-  run cat /lib/systemd/system/aroundtheclock.service
+  run ls /lib/systemd/system/aroundtheclock.service
   [ "$status" -ne 0 ]
 }
 

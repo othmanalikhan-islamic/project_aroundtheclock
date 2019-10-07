@@ -3,15 +3,15 @@ language: python
 
 ### JOBS THAT ARE ASSIGNED TO DEFAULT 'TEST' STAGE.
 
-#python:
-#  - "3.6"
-#  - "3.7"
-#
-#install:
-#  - pip install -r requirements_python.txt
-#  - pip install -r test/requirements_python.txt
-#script: pytest --cov=test/
-#after_success: codecov
+python:
+  - "3.6"
+  - "3.7"
+
+install:
+  - pip install -r requirements_python.txt
+  - pip install -r test/requirements_python.txt
+script: pytest --cov=test/
+after_success: codecov
 
 ### JOBS THAT ARE ASSIGNED TO 'Deploy' STAGE.
 

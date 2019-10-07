@@ -38,6 +38,12 @@
 }
 
 
+@test "Check aroundtheclock.service config file exists" {
+  run cat /lib/systemd/system/aroundtheclock.service
+  [ "$status" -ne 0 ]
+}
+
+
 @test "Check aroundtheclock.service exists" {
   run systemctl status aroundtheclock.service > /dev/null
   [ "$status" -ne 4 ]

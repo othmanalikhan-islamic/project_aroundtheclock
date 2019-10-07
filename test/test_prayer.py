@@ -5,7 +5,7 @@ from collections import OrderedDict
 import pytest
 import schedule
 
-import setup_test_paths
+import setup_paths
 import algorithms
 import prayer
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo -e "\n>>> CREATING BATS DIRECTORY IN HOME DIRECTORY..."
 cd ~ || exit
 mkdir bats

@@ -1,6 +1,6 @@
 import datetime as dt
 
-import setup_test_paths
+import setup_paths
 import algorithms
 
 

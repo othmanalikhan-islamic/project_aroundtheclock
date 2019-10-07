@@ -29,7 +29,7 @@ jobs:
         - ./test/requirements_linux.sh
       script:
         - ls -al /lib/systemd/system
-        - sudo bats ./test/test_deployment.sh
+        - bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION
 

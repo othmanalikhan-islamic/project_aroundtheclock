@@ -28,8 +28,8 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements_linux.sh
       script:
-        - ls -al /lib/systemd/system
         - bats ./test/test_deployment.sh
+        - namei -mo /lib/systemd/system/arountheclock.service
 
 ### EXTRA CONFIGURATION
 

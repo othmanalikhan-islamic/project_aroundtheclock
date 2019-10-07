@@ -29,7 +29,6 @@ jobs:
         - ./test/requirements_linux.sh
       script:
         - bats ./test/test_deployment.sh
-        - namei -mo /lib/systemd/system/arountheclock.service
 
 ### EXTRA CONFIGURATION
 

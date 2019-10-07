@@ -1,3 +1,3 @@
 #!/bin/bash
 source virtual/bin/activate
-python3 aroundtheclock/prayer.py
+python aroundtheclock/prayer.py

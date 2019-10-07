@@ -1,14 +1,13 @@
 import datetime as dt
+import subprocess
 from collections import OrderedDict
 
 import pytest
 import schedule
-import subprocess
-from pytest_mock import mocker
 
+import setup_paths
 import algorithms
 import prayer
-
 
 ######################################## HELPER FUNCTIONS
 
@@ -60,7 +59,7 @@ class EndOfTestException(Exception):
 
 
 mosqueTimings = map(formatPrayers, [
-    ["2019-01-27", "05:05", "11:53", "14:58", "17:19", "18:49"],
+    ["2019-01-27", "05:06", "11:53", "14:58", "17:19", "18:49"],
     ["2019-02-07", "05:00", "11:54", "15:05", "17:28", "18:58"],
     ["2019-02-10", "04:59", "11:54", "15:06", "17:29", "18:59"],
     ["2019-06-02", "03:15", "11:38", "15:05", "18:29", "19:59"],

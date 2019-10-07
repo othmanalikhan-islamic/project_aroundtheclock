@@ -45,7 +45,7 @@ How to Use
 2. Navigate to the root project directory, `cd project_aroundtheclock`
 3. Modify `./config/config.json` to your geolocation, `vi ./config/config.json`
 4. Change permissions of the installation script, `chmod u+x ./bin/install.sh`
-5. Run the installation script **from the root directory**, `./bin/install.sh`.
+5. Run the installation script **from the root directory**, `sudo ./bin/install.sh`.
 
 
 Troubleshooting
@@ -118,6 +118,11 @@ TODO
 - Study how input parameters (e.g. JD, LAT, LON) vary prayer times mathematically.
 - Study domain and range restrictions of formulae
 - Document the findings above in docstrings
-- Add an uninstall script
-- Add tests for deployment
 
+Roadmap
+-------
+1. LED for feedback
+2. Automatic initial setting up of config file
+3. GUI to control config
+4. Advanced ARPing
+5. Add an uninstall script

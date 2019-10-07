@@ -1,0 +1,5 @@
+# Note: requirements.txt == requirements_python.txt
+# This is because Synk uses 'requirements.txt' as a hardcoded name to 
+# conduct its vulnerability scans
+julian==0.14
+schedule==0.6.0

@@ -285,12 +285,12 @@ def main():
         else:
             FORMAT_SCHEDULE = "%H:%M"
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
+            NOW = dt.datetime.now()
+            TODAY = dt.datetime(NOW.year, NOW.month, NOW.day)
 
             # Computing prayer times
             logger.info("Computing today's prayer times {}!".format(dt.date.today()))
-            t = dt.date.today()
-            date = dt.datetime(t.year, t.month, t.day)
-            prayers = computeAllPrayerTimes(date,
+            prayers = computeAllPrayerTimes(TODAY,
                                             (float(CONFIG["longitude"]),
                                              float(CONFIG["latitude"])),
                                             int(CONFIG["timezone"]),
@@ -305,14 +305,11 @@ def main():
             printAllPrayerTimes(prayers)
 
             # Scheduling prayer block times as jobs
-            # NOTE: This logic is simple and sometimes allows prayers from
-            # yesterday to be scheduled for tomorrow. Undesirable but not
-            # much of an issue as delta between prayers 1 day apart is no
-            # more than 2 minutes.
             for p, t in prayers.items():
-                t = t.strftime(FORMAT_SCHEDULE)
-                duration = CONFIG["block"][p]
-                schedule.every().day.at(t).do(blockInternet, duration)
+                # if t > NOW:
+                    t = t.strftime(FORMAT_SCHEDULE)
+                    duration = CONFIG["block"][p]
+                    schedule.every().day.at(t).do(blockInternet, duration)
 
             # Logging scheduled jobs
             for j in schedule.jobs:

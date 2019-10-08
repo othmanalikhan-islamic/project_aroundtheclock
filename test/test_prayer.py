@@ -228,25 +228,33 @@ def testMain_createOutputDirectory_OSInvoked(mocker):
     assert mockMkdir.call_count == 1
 
 
-def testMain_scheduleNewPrayerTimes_scheduledAndWaiting(mocker):
+def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     def branchIfElse(*args, **kwargs):
         mockSchedule.default_scheduler.next_run = True
 
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
-    _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("sys.stdout")
+    _ = mocker.patch("logging.getLogger")
+    _ = mocker.patch("prayer.json.dump")
+    _ = mocker.patch("prayer.Path.mkdir")
 
     mockSchedule = mocker.patch("prayer.schedule")
     mockSchedule.default_scheduler.next_run = False
     mockSchedule.run_pending.side_effect = EndOfTestException
     mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
 
-    mockDate = mocker.patch("prayer.dt.date")
-    mockDate.today.return_value = dt.datetime(2019, 1, 27)
+    NOW = dt.datetime(2019, 1, 27)
+    mockDatetime = mocker.patch("prayer.dt.datetime.now")
+    mockDatetime.return_value = NOW
 
+    # Catching exception as a means to break infinite while loop in source code
     with pytest.raises(EndOfTestException):
         prayer.main()
+
+    # Check if block times have been scheduled
     [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
     assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
+
+    # Check if waiting
     assert mockSchedule.run_pending.call_count == 1

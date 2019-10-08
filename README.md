@@ -18,11 +18,10 @@ Project AroundTheClock: Praying on Time!
 
 Overview
 --------
-
-The objective of AroundTheClock is AroundTheClock is a self-improvement project 
-that is aimed to help muslims regulate praying on time by temporarily disabling 
-internet connectivity at each prayer (e.g. disabling internet for 10 minutes by 
-default during the start of Asr). 
+AroundTheClock is a self-improvement project that is aimed to help muslims 
+regulate praying on time by temporarily disabling internet connectivity at each 
+prayer (e.g. disabling internet for 10 minutes by default during the start of 
+Asr). 
 
 Above is a demo that illustrates it in action: The scenario is that it is 
 approaching Asr prayer time and the internet needs to be 'paused' temporarily.
@@ -46,18 +45,18 @@ How to Use
 3. Modify `./config/config.json` to your geolocation, `vi ./config/config.json`
 4. Change permissions of the installation script, `chmod u+x ./bin/install.sh`
 5. Run the installation script **from the root directory**, `sudo ./bin/install.sh`.
+6. Verify "running" status of project, `systemctl status aroundtheclock.service`
+7. If you face any issue, please check the [troubleshooting](troubleshooting) section.
 
 
 Troubleshooting
 ---------------
 - **Issue:** How do check if aroundtheclock is running?
 - **Solution:** Check its daemon, `systemctl status aroundtheclock.service`.
-<br>
-
+--------------------------------------------------------------------------------
 - **Issue:** I get the error 'Unit aroundtheclock.service could not be found'!
-- **Solution:** The installation process failed. Repeat [steps 4-5][#how-to-use].
-<br>
-
+- **Solution:** The installation process failed. Repeat [steps 4-5](#how-to-use).
+--------------------------------------------------------------------------------
 - **Issue:** I can see aroundtheclock service but its state isn't 'active'!
 - **Solution A:** Restart the service manually, `systemctl restart aroundtheclock.service`.
 - **Solution B:** Check the logs of the service, `journalctl -u aroundtheclock.service`.
@@ -85,9 +84,9 @@ don't fall under this category.
 in `config.json`. The longitude and latitude need to be accurate to 0.1 degree 
 in otherwise it can cause prayer times to be shifted in some cases by 
 up to 3 minutes. Note that clocks on mosques follow pre-defined coordinates, 
-and this sometimes varies between clocks too unfortunately (not full 
-standardization). For now, `config.json` is configured for coordinates in 
-Saudi Arabia, AlKhobar.
+and this sometimes varies between clocks too unfortunately (not fully
+standardized). For now, `config.json` is configured for coordinates of 
+AlKhobar, Saudi Arabia.
 
 
 Authors
@@ -113,6 +112,18 @@ Acknowledgements
     - C++ implementation: http://3adly.blogspot.com/2010/07/prayer-times-calculations-pure-c-code.html
 
 
+Roadmap
+-------
+1. [ ] LED for feedback.
+2. [ ] Automatic initial setting up of config file.
+    2.1 [ ] Integration with Google maps to pickup longitude, latitude.
+    2.2 [ ] Integration with OS to pickup timezone.
+3. [ ] GUI to control config
+    3.1 [ ] Real-time updating of prayer times based on config.json parameters.
+4. [ ] Advanced ARPing
+5. [ ] Add an uninstall script
+
+
 TODO
 ----
 - Study how input parameters (e.g. JD, LAT, LON) vary prayer times mathematically.
@@ -120,11 +131,5 @@ TODO
 - Document the findings above in docstrings
 - Update GIF to match new architecture
 - Draw high-level diagram of operation
-
-Roadmap
--------
-1. [ ] LED for feedback
-2. [ ] Automatic initial setting up of config file
-3. [ ] GUI to control config
-4. [ ] Advanced ARPing
-5. [ ] Add an uninstall script
+- Add TZ commands to sheet
+- Fix sudo arp issue

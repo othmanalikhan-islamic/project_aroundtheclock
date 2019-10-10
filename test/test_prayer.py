@@ -55,6 +55,18 @@ def assertAlmostEqualPrayer(p1, p2, err):
 class EndOfTestException(Exception):
     """Used in mock objects to halt code execution"""
 
+
+class MockToday(dt.datetime):
+    @classmethod
+    def now(cls):
+        return cls(2019, 1, 27)
+
+
+class MockBeforeMaghrib(dt.datetime):
+    @classmethod
+    def now(cls):
+        return cls(2019, 1, 27, 17, 16, 0)
+
 ######################################## TEST DATA (KHOBAR)
 
 
@@ -244,9 +256,7 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     mockSchedule.run_pending.side_effect = EndOfTestException
     mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
 
-    NOW = dt.datetime(2019, 1, 27)
-    mockDatetime = mocker.patch("prayer.dt.datetime.now")
-    mockDatetime.return_value = NOW
+    prayer.dt.datetime = MockToday
 
     # Catching exception as a means to break infinite while loop in source code
     with pytest.raises(EndOfTestException):
@@ -255,6 +265,37 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     # Check if block times have been scheduled
     [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
     assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
+
+    # Check if waiting
+    assert mockSchedule.run_pending.call_count == 1
+
+
+def testMain_beforeMaghribTime_scheduleMaghribIshaOnly(mocker):
+    def branchIfElse(*args, **kwargs):
+        mockSchedule.default_scheduler.next_run = True
+
+    times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
+
+    _ = mocker.patch("sys.stdout")
+    _ = mocker.patch("logging.getLogger")
+    _ = mocker.patch("prayer.json.dump")
+    _ = mocker.patch("prayer.Path.mkdir")
+
+    mockSchedule = mocker.patch("prayer.schedule")
+    mockSchedule.default_scheduler.next_run = False
+    mockSchedule.run_pending.side_effect = EndOfTestException
+    mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
+
+    prayer.dt.datetime = MockBeforeMaghrib
+
+    # Catching exception as a means to break infinite while loop in source code
+    with pytest.raises(EndOfTestException):
+        prayer.main()
+
+    # Check if only two prayers have been scheduled
+    mockSchedule.every.return_value.day.at.assert_any_call(times[3])
+    mockSchedule.every.return_value.day.at.assert_any_call(times[4])
+    assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 2
 
     # Check if waiting
     assert mockSchedule.run_pending.call_count == 1

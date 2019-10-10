@@ -306,7 +306,7 @@ def main():
 
             # Scheduling prayer block times as jobs
             for p, t in prayers.items():
-                # if t > NOW:
+                if t > NOW:
                     t = t.strftime(FORMAT_SCHEDULE)
                     duration = CONFIG["block"][p]
                     schedule.every().day.at(t).do(blockInternet, duration)

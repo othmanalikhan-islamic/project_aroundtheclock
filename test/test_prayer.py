@@ -1,13 +1,16 @@
 import datetime as dt
+import json
 import subprocess
 from collections import OrderedDict
+from pathlib import Path
 
 import pytest
 import schedule
 
-import setup_paths
 import algorithms
 import prayer
+
+import setup_paths      # Setups up paths upon importing
 
 ######################################## HELPER FUNCTIONS
 
@@ -220,6 +223,20 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
 
 ######################################## INTEGRATION TESTS
 
+@pytest.fixture(scope="session", autouse=True)
+def createOutputDirectory():
+    PATH_ROOT = Path(__file__, "../../").absolute().resolve()
+
+    # Reading config file
+    PATH_CONFIG = Path(PATH_ROOT, "config/config.json").absolute().resolve()
+    with open(PATH_CONFIG.as_posix(), "r") as f:
+        CONFIG = json.load(f)
+
+    # Creating output directory
+    PATH_OUT = Path(CONFIG["path"]["output"])
+    PATH_OUT.mkdir(parents=True, exist_ok=True)
+
+
 def testMain_configFileRead_readFileCalled(mocker):
     mockOpen = mocker.mock_open()
     _ = mocker.patch("prayer.open", mockOpen)
@@ -247,7 +264,6 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
     _ = mocker.patch("sys.stdout")
-    _ = mocker.patch("logging.config")
     _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("prayer.json.dump")
     _ = mocker.patch("prayer.Path.mkdir")
@@ -278,7 +294,6 @@ def testMain_beforeMaghribTime_scheduleMaghribIshaOnly(mocker):
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
     _ = mocker.patch("sys.stdout")
-    _ = mocker.patch("logging.config")
     _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("prayer.json.dump")
     _ = mocker.patch("prayer.Path.mkdir")

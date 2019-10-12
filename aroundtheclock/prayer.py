@@ -72,8 +72,8 @@ def blockInternet(duration):
     thereby 'suspending' connectivity to WAN (internet) for the given duration.
 
     Pre-requisites for this function to run properly:
-        1. Install arpspoof on OS: sudo apt-get install dsniffer.
-        2. Run this function using an OS account with privileges.
+        1. Install arpspoof on OS: sudo apt-get install dsniff.
+        2. Run this function using an OS account with root privileges.
 
     :param duration: Integer, the block duration in minutes.
     :return: Scheduler.CancelJob, making this function a one-off job (no repeat).
@@ -88,7 +88,7 @@ def blockInternet(duration):
     try:
         logging.info("Blocking internet for {} minute(s)!".format(duration))
         seconds = duration*60
-        subprocess.run(["sudo", "timeout", str(seconds), "arpspoof", "-i", INTERFACE, GATEWAY],
+        subprocess.run(["timeout", str(seconds), "sudo", "arpspoof", "-i", INTERFACE, GATEWAY],
                        timeout=seconds)
     except subprocess.TimeoutExpired:
         logging.info("Block time over, unblocking internet now!")

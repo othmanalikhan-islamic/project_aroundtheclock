@@ -188,7 +188,7 @@ def testBlockInternet_startBlocking_executeOSCommands(mocker):
     """
 
     mockSubprocess = mocker.patch("subprocess.run", return_value=mockIPRoute)
-    arpPoison = ["sudo", "timeout", "600", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
+    arpPoison = ["timeout", "600", "sudo", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
     kwargs = {"timeout": 600}
 
     prayer.blockInternet(10)

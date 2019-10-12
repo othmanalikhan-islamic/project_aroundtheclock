@@ -247,6 +247,7 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
     _ = mocker.patch("sys.stdout")
+    _ = mocker.patch("logging.config")
     _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("prayer.json.dump")
     _ = mocker.patch("prayer.Path.mkdir")
@@ -277,6 +278,7 @@ def testMain_beforeMaghribTime_scheduleMaghribIshaOnly(mocker):
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
     _ = mocker.patch("sys.stdout")
+    _ = mocker.patch("logging.config")
     _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("prayer.json.dump")
     _ = mocker.patch("prayer.Path.mkdir")

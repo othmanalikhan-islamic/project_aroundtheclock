@@ -108,7 +108,7 @@ def writePrayerTimes(prayers, PATH_OUT):
 
     prayers = [(p, t.strftime(DATETIME_FORMAT)) for p, t in prayers.items()]
     prayers = OrderedDict(prayers)
-    with open(PATH_OUT.as_posix(), 'w') as f:
+    with open(PATH_OUT.as_posix(), 'w+') as f:
         json.dump(prayers, f, indent=4)
 
 

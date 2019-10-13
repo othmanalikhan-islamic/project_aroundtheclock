@@ -132,4 +132,13 @@ TODO
 - Update GIF to match new architecture
 - Draw high-level diagram of operation
 - Add TZ commands to sheet
-- Fix sudo arp issue
+- Fix arpspoofing happening infinitely
+- Fix prayer time not scheduled after Isha (end of day)
+
+
+Checklist
+---------
+- Unit/Integration Tests
+- Deployment tests
+- VM Arpspoofing test
+- Real deployment test

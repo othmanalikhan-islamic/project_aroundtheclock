@@ -70,6 +70,12 @@ class MockBeforeMaghrib(dt.datetime):
     def now(cls):
         return cls(2019, 1, 27, 17, 16, 0)
 
+
+class MockAfterIsha(dt.datetime):
+    @classmethod
+    def now(cls):
+        return cls(2019, 1, 27, 19, 46, 0)
+
 ######################################## TEST DATA (KHOBAR)
 
 
@@ -313,6 +319,38 @@ def testMain_beforeMaghribTime_scheduleMaghribIshaOnly(mocker):
     mockSchedule.every.return_value.day.at.assert_any_call(times[3])
     mockSchedule.every.return_value.day.at.assert_any_call(times[4])
     assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 2
+
+    # Check if waiting
+    assert mockSchedule.run_pending.call_count == 1
+
+
+def testMain_afterIshaTime_scheduleTomorrowPrayers(mocker):
+    def branchIfElse(*args, **kwargs):
+        mockSchedule.default_scheduler.next_run = True
+
+    times = ["05:04", "11:52", "14:57", "17:18", "18:48"]
+
+    _ = mocker.patch("sys.stdout")
+    _ = mocker.patch("logging.getLogger")
+    _ = mocker.patch("prayer.json.dump")
+    _ = mocker.patch("prayer.Path.mkdir")
+
+    mockSchedule = mocker.patch("prayer.schedule")
+    mockSchedule.default_scheduler.next_run = False
+    mockSchedule.run_pending.side_effect = EndOfTestException
+    mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
+
+    prayer.dt.datetime = MockAfterIsha
+
+    # Catching exception as a means to break infinite while loop in source code
+    with pytest.raises(EndOfTestException):
+        prayer.main()
+
+    # Check if only two prayers have been scheduled
+    # mockSchedule.every.return_value.day.at.assert_any_call(times[3])
+    # mockSchedule.every.return_value.day.at.assert_any_call(times[4])
+    [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
+    assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
 
     # Check if waiting
     assert mockSchedule.run_pending.call_count == 1

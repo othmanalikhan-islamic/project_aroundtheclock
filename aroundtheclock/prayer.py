@@ -287,6 +287,7 @@ def main():
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
             NOW = dt.datetime.now()
             TODAY = dt.datetime(NOW.year, NOW.month, NOW.day)
+            TOMORROW = TODAY + dt.timedelta(days=1)
 
             # Computing prayer times
             logger.info("Computing today's prayer times {}!".format(dt.date.today()))
@@ -296,6 +297,15 @@ def main():
                                             int(CONFIG["timezone"]),
                                             CONFIG["fajr_isha"],
                                             CONFIG["asr"])
+
+            scheduleTimes = [t for t in prayers.values() if t > NOW]
+            if not scheduleTimes:
+                prayers = computeAllPrayerTimes(TOMORROW,
+                                                (float(CONFIG["longitude"]),
+                                                 float(CONFIG["latitude"])),
+                                                int(CONFIG["timezone"]),
+                                                CONFIG["fajr_isha"],
+                                                CONFIG["asr"])
 
             # Logging prayer times computed
             ps = ["{}: {}".format(p, t.strftime(FORMAT_PRINT)) for p, t in prayers.items()]

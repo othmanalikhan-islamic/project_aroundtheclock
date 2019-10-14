@@ -112,7 +112,7 @@ def writePrayerTimes(prayers, PATH_OUT):
         json.dump(prayers, f, indent=4)
 
 
-def printAllPrayerTimes(prayers):
+def printPrayerTimes(prayers):
     """
     Prints the prayer times in a neat table.
 
@@ -125,7 +125,7 @@ def printAllPrayerTimes(prayers):
         print("{:<8}: {}".format(prayer, time.strftime(PRINT_FORMAT)))
 
 
-def computeAllPrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrConvention):
+def computePrayerTimes(date, coordinates, timezone, fajrIshaConvention, asrConvention):
     """
     Calculates the prayer time for all prayers for a given day.
 
@@ -254,6 +254,36 @@ def computeIshaUmmAlQura(maghrib):
     return isha
 
 
+def nextFivePrayers(coordinates, timezone, fajrIshaConvention, asrConvention):
+    """
+    Calculates the five upcoming prayer times based on the current time.
+
+    :param coordinates: 2-Tuple, (longitude, latitude) of the point of interest in degrees.
+    :param timezone: Number, the timezone of the point of interest in hours.
+    :param fajrIshaConvention: String, the angle convention (see dictionary below).
+    :param asrConvention: String, the shadow length multiplier (see dictionary below).
+    :return: OrderedDictionary, mapping prayer names to prayer times (datetime objects).
+    """
+    NOW = dt.datetime.now()
+    TODAY = dt.datetime(NOW.year, NOW.month, NOW.day)
+    TOMORROW = TODAY + dt.timedelta(days=1)
+
+    prayers = OrderedDict()
+    args = [coordinates, timezone, fajrIshaConvention, asrConvention]
+
+    prayersToday = computePrayerTimes(TODAY, *args)
+    prayersTomorrow = computePrayerTimes(TOMORROW, *args)
+
+    # Choosing 5 prayers in total: today's remaining prayers + some from tomorrow
+    prayersLeftToday = len([t for t in prayersToday.values() if t > NOW])
+    [prayersToday.popitem(last=False) for _ in range(5 - prayersLeftToday)]
+    [prayersTomorrow.popitem(last=True) for _ in range(prayersLeftToday)]
+
+    prayers.update(prayersToday)
+    prayers.update(prayersTomorrow)
+    return prayers
+
+
 ################################################# RUNNING SCRIPT
 
 
@@ -265,6 +295,9 @@ def main():
     PATH_CONFIG = Path(PATH_ROOT, "config/config.json").absolute().resolve()
     with open(PATH_CONFIG.as_posix(), "r") as f:
         CONFIG = json.load(f)
+        CONFIG["longitude"] = float(CONFIG["longitude"])
+        CONFIG["latitude"] = float(CONFIG["latitude"])
+        CONFIG["timezone"] = int(CONFIG["timezone"])
 
     # Creating output directory
     PATH_OUT = Path(CONFIG["path"]["output"])
@@ -277,7 +310,7 @@ def main():
 
     ######################################## SCHEDULING
 
-    # Schedule today's prayer blocking times otherwise wait on existing jobs.
+    # Schedule blocking times for prayers otherwise wait on existing jobs.
     while True:
         if schedule.default_scheduler.next_run:
             schedule.run_pending()
@@ -285,41 +318,26 @@ def main():
         else:
             FORMAT_SCHEDULE = "%H:%M"
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
-            NOW = dt.datetime.now()
-            TODAY = dt.datetime(NOW.year, NOW.month, NOW.day)
-            TOMORROW = TODAY + dt.timedelta(days=1)
 
             # Computing prayer times
             logger.info("Computing today's prayer times {}!".format(dt.date.today()))
-            prayers = computeAllPrayerTimes(TODAY,
-                                            (float(CONFIG["longitude"]),
-                                             float(CONFIG["latitude"])),
-                                            int(CONFIG["timezone"]),
-                                            CONFIG["fajr_isha"],
-                                            CONFIG["asr"])
-
-            scheduleTimes = [t for t in prayers.values() if t > NOW]
-            if not scheduleTimes:
-                prayers = computeAllPrayerTimes(TOMORROW,
-                                                (float(CONFIG["longitude"]),
-                                                 float(CONFIG["latitude"])),
-                                                int(CONFIG["timezone"]),
-                                                CONFIG["fajr_isha"],
-                                                CONFIG["asr"])
+            prayers = nextFivePrayers((CONFIG["longitude"], CONFIG["latitude"]),
+                                      CONFIG["timezone"],
+                                      CONFIG["fajr_isha"],
+                                      CONFIG["asr"])
 
             # Logging prayer times computed
             ps = ["{}: {}".format(p, t.strftime(FORMAT_PRINT)) for p, t in prayers.items()]
             timings = ", ".join(ps)
             logger.info("Prayer times generated: {}.".format(timings))
             writePrayerTimes(prayers, Path(CONFIG["path"]["prayer"]))
-            printAllPrayerTimes(prayers)
+            printPrayerTimes(prayers)
 
             # Scheduling prayer block times as jobs
             for p, t in prayers.items():
-                if t > NOW:
-                    t = t.strftime(FORMAT_SCHEDULE)
-                    duration = CONFIG["block"][p]
-                    schedule.every().day.at(t).do(blockInternet, duration)
+                t = t.strftime(FORMAT_SCHEDULE)
+                duration = CONFIG["block"][p]
+                schedule.every().day.at(t).do(blockInternet, duration)
 
             # Logging scheduled jobs
             for j in schedule.jobs:

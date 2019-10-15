@@ -1,16 +1,16 @@
 import datetime as dt
-import json
 import subprocess
 from collections import OrderedDict
-from pathlib import Path
 
 import pytest
 import schedule
 
-import algorithms
-import prayer
 
-import setup_paths      # Setups up paths upon importing
+import setup_paths
+setup_paths.setupPaths()
+import block as block
+import algorithms as algorithms
+import prayer as prayer
 
 ######################################## HELPER FUNCTIONS
 
@@ -55,26 +55,11 @@ def assertAlmostEqualPrayer(p1, p2, err):
                     .format(hours, minutes, seconds, p1, p2))
 
 
-class EndOfTestException(Exception):
-    """Used in mock objects to halt code execution"""
-
-
-class MockToday(dt.datetime):
-    @classmethod
-    def now(cls):
-        return cls(2019, 1, 27)
-
-
 class MockBeforeMaghrib(dt.datetime):
     @classmethod
     def now(cls):
         return cls(2019, 1, 27, 17, 16, 0)
 
-
-class MockAfterIsha(dt.datetime):
-    @classmethod
-    def now(cls):
-        return cls(2019, 1, 27, 19, 46, 0)
 
 ######################################## TEST DATA (KHOBAR)
 
@@ -202,7 +187,7 @@ def testNextFivePrayers_khobarCity_calculatePrecisely(kParams):
 
 
 def testOneTimeJobDecorator_scheduledJob_returnCancelJobWhenDone():
-    scheduledFunction = prayer.oneTimeJob(lambda x: 0)
+    scheduledFunction = block.oneTimeJob(lambda x: 0)
     assert scheduledFunction(0) == schedule.CancelJob
 
 
@@ -218,7 +203,7 @@ def testBlockInternet_startBlocking_executeOSCommands(mocker):
     arpPoison = ["timeout", "600", "sudo", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
     kwargs = {"timeout": 600}
 
-    prayer.blockInternet(10)
+    block.blockInternet(10)
     mockSubprocess.assert_called_with(arpPoison, **kwargs)
 
 
@@ -227,7 +212,7 @@ def testBlockInternet_stopBlocking_returnTimeout(mocker):
     mockSubprocess = mocker.patch("subprocess.run", side_effect=calls)
 
     try:
-        prayer.blockInternet(10)
+        block.blockInternet(10)
         assert mockSubprocess.call_count == 2
     except subprocess.TimeoutExpired:
         pytest.fail("TimeoutExpired exception was raised when it shouldn't!")
@@ -243,71 +228,4 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
 
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})
-
-
-######################################## INTEGRATION TESTS
-
-
-@pytest.fixture(scope="session", autouse=True)
-def createOutputDirectory():
-    PATH_ROOT = Path(__file__, "../../").absolute().resolve()
-
-    # Reading config file
-    PATH_CONFIG = Path(PATH_ROOT, "config/config.json").absolute().resolve()
-    with open(PATH_CONFIG.as_posix(), "r") as f:
-        CONFIG = json.load(f)
-
-    # Creating output directory
-    PATH_OUT = Path(CONFIG["path"]["output"])
-    PATH_OUT.mkdir(parents=True, exist_ok=True)
-
-
-def testMain_configFileRead_readFileCalled(mocker):
-    mockOpen = mocker.mock_open()
-    _ = mocker.patch("prayer.open", mockOpen)
-    mockJSON = mocker.patch("prayer.json")
-    mockJSON.load.side_effect = EndOfTestException
-
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-    assert mockJSON.load.call_count == 1
-
-
-def testMain_createOutputDirectory_OSInvoked(mocker):
-    mockMkdir = mocker.patch("prayer.Path.mkdir")
-    mockMkdir.side_effect = EndOfTestException
-
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-    assert mockMkdir.call_count == 1
-
-
-def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
-    def branchIfElse(*args, **kwargs):
-        mockSchedule.default_scheduler.next_run = True
-
-    times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
-
-    _ = mocker.patch("sys.stdout")
-    _ = mocker.patch("logging.getLogger")
-    _ = mocker.patch("prayer.json.dump")
-    _ = mocker.patch("prayer.Path.mkdir")
-
-    mockSchedule = mocker.patch("prayer.schedule")
-    mockSchedule.default_scheduler.next_run = False
-    mockSchedule.run_pending.side_effect = EndOfTestException
-    mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
-
-    prayer.dt.datetime = MockToday
-
-    # Catching exception as a means to break infinite while loop in source code
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-
-    # Check if block times have been scheduled
-    [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
-    assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
-
-    # Check if waiting
-    assert mockSchedule.run_pending.call_count == 1
 

@@ -5,9 +5,12 @@ from collections import OrderedDict
 import pytest
 import schedule
 
+
 import setup_paths
-import algorithms
-import prayer
+setup_paths.setupPaths()
+import block as block
+import algorithms as algorithms
+import prayer as prayer
 
 ######################################## HELPER FUNCTIONS
 
@@ -52,8 +55,11 @@ def assertAlmostEqualPrayer(p1, p2, err):
                     .format(hours, minutes, seconds, p1, p2))
 
 
-class EndOfTestException(Exception):
-    """Used in mock objects to halt code execution"""
+class MockBeforeMaghrib(dt.datetime):
+    @classmethod
+    def now(cls):
+        return cls(2019, 1, 27, 17, 16, 0)
+
 
 ######################################## TEST DATA (KHOBAR)
 
@@ -86,9 +92,11 @@ def kParams():
         "F_ANG": 18.5,
         "M_ANG": 0.833,
         "I_ANG": 15.0,
-        "LON": 50.2083,
-        "LAT": 26.2172,
+        "LON": 50.0000,
+        "LAT": 26.6000,
         "SHA": 1,
+        "FI": "umm_alqura",
+        "A": "standard",
     }
     return param
 
@@ -144,26 +152,42 @@ def testComputeIsha_khobarCity_calculateKhobarIsha(kPrayers, kParams):
 
 
 @pytest.mark.parametrize("timings", [t for t in mosqueTimings])
-def testComputeAllPrayerTimes_khobarCity_calculatePrecisely(timings):
+def testComputePrayerTimes_khobarCity_calculatePrecisely(timings, kParams):
     timings = [dt.datetime.strptime(t, FORMAT) for t in timings]
     date = dt.datetime(timings[0].year, timings[0].month, timings[0].day)
-    fajrIshaConvention = "umm_alqura"
-    asrConvention = "standard"
-    coordinates = (50.0000, 26.6000)
-    timezone = 3
 
-    prayers = prayer.computeAllPrayerTimes(date,
-                                           coordinates,
-                                           timezone,
-                                           fajrIshaConvention,
-                                           asrConvention)
+    prayers = prayer.computePrayerTimes(date,
+                                        (kParams["LON"], kParams["LAT"]),
+                                        kParams["TZ"],
+                                        kParams["FI"],
+                                        kParams["A"])
+
+    for p1, p2 in zip(prayers.values(), timings):
+        assertAlmostEqualPrayer(p1, p2, 2)
+
+
+def testNextFivePrayers_khobarCity_calculatePrecisely(kParams):
+    timings = [
+        "2019-01-27 17:19",
+        "2019-01-27 18:49",
+        "2019-01-28 05:05",
+        "2019-01-28 11:53",
+        "2019-01-28 14:57"
+    ]
+    timings = [dt.datetime.strptime(t, FORMAT) for t in timings]
+
+    prayer.dt.datetime = MockBeforeMaghrib
+    prayers = prayer.nextFivePrayers((kParams["LON"], kParams["LAT"]),
+                                     kParams["TZ"],
+                                     kParams["FI"],
+                                     kParams["A"])
 
     for p1, p2 in zip(prayers.values(), timings):
         assertAlmostEqualPrayer(p1, p2, 2)
 
 
 def testOneTimeJobDecorator_scheduledJob_returnCancelJobWhenDone():
-    scheduledFunction = prayer.oneTimeJob(lambda x: 0)
+    scheduledFunction = block.oneTimeJob(lambda x: 0)
     assert scheduledFunction(0) == schedule.CancelJob
 
 
@@ -176,10 +200,10 @@ def testBlockInternet_startBlocking_executeOSCommands(mocker):
     """
 
     mockSubprocess = mocker.patch("subprocess.run", return_value=mockIPRoute)
-    arpPoison = ["sudo", "timeout", "600", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
+    arpPoison = ["timeout", "600", "sudo", "arpspoof", "-i", "enp0s3", "10.0.2.2"]
     kwargs = {"timeout": 600}
 
-    prayer.blockInternet(10)
+    block.blockInternet(10)
     mockSubprocess.assert_called_with(arpPoison, **kwargs)
 
 
@@ -188,7 +212,7 @@ def testBlockInternet_stopBlocking_returnTimeout(mocker):
     mockSubprocess = mocker.patch("subprocess.run", side_effect=calls)
 
     try:
-        prayer.blockInternet(10)
+        block.blockInternet(10)
         assert mockSubprocess.call_count == 2
     except subprocess.TimeoutExpired:
         pytest.fail("TimeoutExpired exception was raised when it shouldn't!")
@@ -205,48 +229,3 @@ def testWritePrayerTimes_writeToFile_writeCalledProperly(mocker, kPrayers):
     prayer.writePrayerTimes(kPrayers, mocker.MagicMock())
     mockJSON.dump.assert_called_with(out, mockOpen(), **{"indent": 4})
 
-
-######################################## INTEGRATION TESTS
-
-def testMain_configFileRead_readFileCalled(mocker):
-    mockOpen = mocker.mock_open()
-    _ = mocker.patch("prayer.open", mockOpen)
-    mockJSON = mocker.patch("prayer.json")
-    mockJSON.load.side_effect = EndOfTestException
-
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-    assert mockJSON.load.call_count == 1
-
-
-def testMain_createOutputDirectory_OSInvoked(mocker):
-    mockMkdir = mocker.patch("prayer.Path.mkdir")
-    mockMkdir.side_effect = EndOfTestException
-
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-    assert mockMkdir.call_count == 1
-
-
-def testMain_scheduleNewPrayerTimes_scheduledAndWaiting(mocker):
-    def branchIfElse(*args, **kwargs):
-        mockSchedule.default_scheduler.next_run = True
-
-    times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
-
-    _ = mocker.patch("logging.getLogger")
-    _ = mocker.patch("sys.stdout")
-
-    mockSchedule = mocker.patch("prayer.schedule")
-    mockSchedule.default_scheduler.next_run = False
-    mockSchedule.run_pending.side_effect = EndOfTestException
-    mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
-
-    mockDate = mocker.patch("prayer.dt.date")
-    mockDate.today.return_value = dt.datetime(2019, 1, 27)
-
-    with pytest.raises(EndOfTestException):
-        prayer.main()
-    [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
-    assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
-    assert mockSchedule.run_pending.call_count == 1

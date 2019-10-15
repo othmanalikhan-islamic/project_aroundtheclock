@@ -181,7 +181,7 @@ def computeDiff(p1, p2):
 #         latitude = random.uniform(*latitudeRange)
 #         coord = (longitude, latitude)
 #
-#         ps = computeAllPrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
+#         ps = computePrayerTimes(date, coord, timezone, fajrIshaConvention, asrConvention)
 #         ps = [prayer for name, prayer in ps.items()]
 #
 #         errorFunction = lambda hour, min, sec: 60*hour + min + sec/60

@@ -1,40 +1,45 @@
 """
-Responsible for controlling the Raspberry Pi pins.
+Responsible for controlling the Raspberry Pi pins connected to an LED.
 """
 
 
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
+GPIO = None
 import time
 
 
-LED_PIN = 18
-
-
-def initialisePi():
+def initialisePi(pin: int):
     """
     Initialises the PIN to be connected to the LED.
 
+    :param pin: The pin connected to the LED.
     :return:
     """
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(LED_PIN, GPIO.OUT)
-    GPIO.setup(LED_PIN, GPIO.LOW)
+    FREQUENCY = 1000
 
-    led = GPIO.PWM(LED_PIN, 1000)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.setup(pin, GPIO.LOW)
+
+    led = GPIO.PWM(pin, FREQUENCY)
     led.start(0)
     return led
 
 
-def blinkLED(pin, pause):
+def blinkLED(pin, speed: int):
     """
+    Causes the LED to gradually change brightness (0% -> 100% -> 0%).
 
     :param pin:
-    :param pause: Integer, the number of seconds to
-    :return:
+    :param speed: The number of seconds the LED takes to blink.
     """
-    DUTY_DELAY = 0.05
+    INTERVAL = 5
+    MIN_PERCENT = 0
+    MAX_PERCENT = 100
+    STEPS = (MAX_PERCENT - MIN_PERCENT) / INTERVAL
+    DUTY_DELAY = speed / (2 * STEPS)
 
-    print("Fire me up Scotty! (Pin 18)")
+    print(f"Fire me up Scotty! (Pin {pin})")
 
     for percentage in range(0, 100, 5):
         pin.ChangeDutyCycle(percentage)
@@ -44,16 +49,18 @@ def blinkLED(pin, pause):
         pin.ChangeDutyCycle(percentage)
         time.sleep(DUTY_DELAY)
 
-    print("Power is dry!")
+    print("Power's dry!")
 
 
 def main():
     """
     Entry point of the module.
     """
-    led = initialisePi()
+    LED_PIN = 18
+    led = initialisePi(LED_PIN)
     blinkLED(led, 1)
 
 
 if __name__ == "__main__":
     main()
+

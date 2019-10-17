@@ -5,7 +5,10 @@ Block internet connectivity via arp poisoning.
 import functools
 import logging
 import logging.config
+import shlex
 import subprocess
+from subprocess import PIPE, Popen
+from threading import Timer
 
 import schedule
 
@@ -22,9 +25,13 @@ def oneTimeJob(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        func(*args, **kwargs)
-        logging.info("Next job at {}.".format(schedule.default_scheduler.next_run))
-        return schedule.CancelJob
+        try:
+            logging.info("Next job at {}.".format(schedule.jobs[1].next_run))
+        except IndexError:
+            logging.info("No next job scheduled!")
+        finally:
+            func(*args, **kwargs)
+            return schedule.CancelJob
     return wrapper
 
 
@@ -49,11 +56,15 @@ def blockInternet(duration):
     logging.info("Found GW={}, INT={}".format(GATEWAY, INTERFACE))
 
     # Arp spoof entire network for a limited duration
-    try:
-        logging.info("Blocking internet for {} minute(s)!".format(duration))
-        seconds = duration*60
-        subprocess.run(["timeout", str(seconds), "sudo", "arpspoof", "-i", INTERFACE, GATEWAY],
-                       timeout=seconds)
-    except subprocess.TimeoutExpired:
-        logging.info("Block time over, unblocking internet now!")
+    seconds = duration * 60
+    cmd = "sudo arpspoof -i {} {}".format(INTERFACE, GATEWAY)
+    proc = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
+    timer = Timer(seconds, proc.kill)
+    logging.info("Blocking internet for {} minute(s)!".format(duration))
+    logging.info("Ran the following command to block: '{}'".format(cmd))
 
+    try:
+        timer.start()
+    finally:
+        logging.info("Block time over, unblocking internet now!")
+        timer.cancel()

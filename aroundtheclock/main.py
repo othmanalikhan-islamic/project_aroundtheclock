@@ -11,6 +11,7 @@ from pathlib import Path
 
 import schedule
 
+import led
 from block import blockInternet
 from prayer import nextFivePrayers, printPrayerTimes, writePrayerTimes
 
@@ -38,19 +39,26 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Starting project AroundTheClock!")
 
+    # Initialising LED
+    pin = led.initialisePi(CONFIG["pin"])
+
     ######################################## SCHEDULING
 
     # Schedule blocking times for prayers otherwise wait on existing jobs.
     while True:
         if schedule.default_scheduler.next_run:
             schedule.run_pending()
-            time.sleep(1)
+            blinkSpeed = schedule.default_scheduler.next_run - dt.datetime.now()
+            blinkSpeed = blinkSpeed.total_seconds() / 3600
+            if blinkSpeed < 0.5:
+                blinkSpeed = 0.5
+            led.blinkLED(pin, blinkSpeed)
         else:
             FORMAT_SCHEDULE = "%H:%M"
             FORMAT_PRINT = "%Y-%m-%d %H:%M"
 
             # Computing prayer times
-            logger.info("Computing today's prayer times {}!".format(dt.date.today()))
+            logger.info("Computing next five prayers after {}!".format(dt.date.today()))
             prayers = nextFivePrayers((CONFIG["longitude"], CONFIG["latitude"]),
                                       CONFIG["timezone"],
                                       CONFIG["fajr_isha"],

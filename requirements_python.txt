@@ -3,3 +3,4 @@
 # conduct its vulnerability scans
 julian==0.14
 schedule==0.6.0
+RPi.GPIO==0.7.0

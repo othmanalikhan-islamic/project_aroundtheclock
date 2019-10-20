@@ -51,21 +51,24 @@ def blockInternet(duration):
     :return: Scheduler.CancelJob, making this function a one-off job (no repeat).
     """
     # Fetch network parameters from OS for arp spoofing
-    p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
-    GATEWAY = p1.stdout.split()[2].decode("ascii")
-    INTERFACE = p1.stdout.split()[4].decode("ascii")
-    logging.info("Found GW={}, INT={}".format(GATEWAY, INTERFACE))
+    try:
+        # Send output to PIPE to store in buffer
+        p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
+        GATEWAY = p1.stdout.split()[2].decode("ascii")
+        INTERFACE = p1.stdout.split()[4].decode("ascii")
+        logging.info("Found GW={}, INT={}".format(GATEWAY, INTERFACE))
+    except OSError as e:
+        logging.exception("The output of 'ip route' is empty! It looks like"
+                          "The OS networking service might need a restart!")
+        raise e("'ip route' failed to return output!")
+
+    logging.info("Blocking internet for {} minute(s)!".format(duration))
 
     # Arp spoof entire network for a limited duration
-    seconds = duration * 60
-    cmd = "sudo arpspoof -i {} {}".format(INTERFACE, GATEWAY)
-    proc = Popen(shlex.split(cmd), stdout=PIPE, stderr=PIPE)
-    timer = Timer(seconds, proc.kill)
-    logging.info("Blocking internet for {} minute(s)!".format(duration))
+    seconds = int(duration * 60)
+    cmd = "sudo aroundtheclock {} {} {}".format(INTERFACE, GATEWAY, seconds)
     logging.info("Ran the following command to block: '{}'".format(cmd))
+    proc = Popen(shlex.split(cmd))
+    proc.communicate()  # Block subsequent execution until finished
 
-    try:
-        timer.start()
-    finally:
-        logging.info("Block time over, unblocking internet now!")
-        timer.cancel()
+    logging.info("Block time over, unblocking internet now!")

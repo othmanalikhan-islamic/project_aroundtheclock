@@ -7,9 +7,6 @@ import logging
 import logging.config
 import shlex
 import subprocess
-from subprocess import PIPE, Popen
-from threading import Timer
-
 
 import schedule
 
@@ -53,22 +50,21 @@ def blockInternet(duration):
     # Fetch network parameters from OS for arp spoofing
     try:
         # Send output to PIPE to store in buffer
-        p1 = subprocess.run(["ip", "route"], stdout=subprocess.PIPE)
+        cmdRoute = "ip route"
+        p1 = subprocess.run(shlex.split(cmdRoute), stdout=subprocess.PIPE)
         GATEWAY = p1.stdout.split()[2].decode("ascii")
         INTERFACE = p1.stdout.split()[4].decode("ascii")
         logging.info("Found GW={}, INT={}".format(GATEWAY, INTERFACE))
-    except OSError as e:
+    except IndexError:
         logging.exception("The output of 'ip route' is empty! It looks like"
                           "The OS networking service might need a restart!")
-        raise e("'ip route' failed to return output!")
-
-    logging.info("Blocking internet for {} minute(s)!".format(duration))
+        raise OSError("'ip route' failed to return output!")
 
     # Arp spoof entire network for a limited duration
+    logging.info("Blocking internet for {} minute(s)!".format(duration))
     seconds = int(duration * 60)
-    cmd = "sudo aroundtheclock {} {} {}".format(INTERFACE, GATEWAY, seconds)
-    logging.info("Ran the following command to block: '{}'".format(cmd))
-    proc = Popen(shlex.split(cmd))
+    cmdBlock = "sudo aroundtheclock {} {} {}".format(INTERFACE, GATEWAY, seconds)
+    logging.info("Ran the following command to block: '{}'".format(cmdBlock))
+    proc = subprocess.run(shlex.split(cmdBlock))
     proc.communicate()  # Block subsequent execution until finished
-
     logging.info("Block time over, unblocking internet now!")

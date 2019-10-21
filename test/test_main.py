@@ -6,6 +6,8 @@ import pytest
 
 import setup_paths
 setup_paths.setupPaths()
+setup_paths.importFakeRPiModule()
+
 import main as main
 
 ######################################## HELPER FUNCTIONS

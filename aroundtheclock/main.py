@@ -47,12 +47,12 @@ def main():
     # Schedule blocking times for prayers otherwise wait on existing jobs.
     while True:
         if schedule.default_scheduler.next_run:
-            schedule.run_pending()
             blinkSpeed = schedule.default_scheduler.next_run - dt.datetime.now()
             blinkSpeed = blinkSpeed.total_seconds() / 3600
             if blinkSpeed < 0.5:
                 blinkSpeed = 0.5
             led.blinkLED(pin, blinkSpeed)
+            schedule.run_pending()
         else:
             FORMAT_SCHEDULE = "%H:%M"
             FORMAT_PRINT = "%Y-%m-%d %H:%M"

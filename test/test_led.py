@@ -2,12 +2,15 @@ import pytest
 
 import setup_paths
 setup_paths.setupPaths()
-# import led
+setup_paths.importFakeRPiModule()
+import led
 
 
-# def testMain_configFileRead_readFileCalled(mocker):
-#     # _ = mocker.patch("led.RPi.GPIO")
-#     mockSleep = mocker.patch("led.time.sleep")
-#     led.blinkLED(10, 1)
-#     assert mockSleep.call_count == 40
+def testBlinkLED_TwelveSecondsDuration_sleepCalledForThreeSeconds(mocker):
+    mockSleep = mocker.patch("led.time.sleep")
+    led.blinkLED(mocker.MagicMock(), 12)
+
+    durationSleep = mockSleep.call_args[0][0]
+    timesCalled = mockSleep.call_count
+    assert timesCalled * durationSleep == 12
 

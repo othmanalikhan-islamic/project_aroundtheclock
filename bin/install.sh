@@ -26,7 +26,7 @@ python3 -m venv virtual
 source ./virtual/bin/activate
 yes | pip install -r requirements_python.txt
 
-echo -e "\n>>> CREATING A DAEMON USER 'AROUNDTHECLOCK'"
+echo -e "\n>>> CREATING AN AROUNDTHECLOCK DAEMON USER"
 sudo useradd -r aroundtheclock -s /bin/false
 
 echo -e "\n>>> INSTALLING AROUNDTHECLOCK AS A DAEMON..."
@@ -57,3 +57,7 @@ addIfMissingInSudoers "$entry3"
 echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."
 sudo systemctl enable aroundtheclock.service
 sudo systemctl start aroundtheclock.service
+
+echo -e "\n>>> DONE INSTALLING! CHECKING IF AROUNDTHECLOCK IS RUNNING..."
+sleep 3
+sudo systemctl status aroundtheclock.service

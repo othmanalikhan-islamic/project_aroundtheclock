@@ -2,40 +2,37 @@
 
 PROGRAM=$0
 
-function usage {
-	echo -e "\nCOMMAND: '$PROGRAM'"
+function usage() {
+  echo -e "\nCOMMAND: '$PROGRAM'"
 
-	echo -e "\nDESCRIPTION: A utility used by project_aroundtheclock to"
-	echo "    temporarily block the internet. This command is invoked by"
-	echo "    the project itself and shouldn't normally be used as a standalone."
+  echo -e "\nDESCRIPTION: A utility used by project_aroundtheclock to"
+  echo "    temporarily block the internet. This command is invoked by"
+  echo "    the project itself and shouldn't normally be used as a standalone."
 
-	echo -e "\nDEPENDENCIES: dnsniff"
+  echo -e "\nDEPENDENCIES: dnsniff"
 
-	echo -e "\nUSAGE: $PROGRAM <INTERFACE> <GATEWAY> <DURATION>"
-	echo "    INTERFACE 		the network interface connected to the blocking network"
-	echo "    GATEWAY		the gateway that needs to be blocked temporarily"
-	echo "    DURATION		the duration is seconds to block internet"
-	exit 1
+  echo -e "\nUSAGE: $PROGRAM <INTERFACE> <GATEWAY> <DURATION>"
+  echo "    INTERFACE 		the network interface connected to the blocking network"
+  echo "    GATEWAY		the gateway that needs to be blocked temporarily"
+  echo "    DURATION		the duration is seconds to block internet"
+  exit 1
 }
 
+function blockInternet() {
+  INTERFACE="$1"
+  GATEWAY="$2"
+  DURATION="$3"
 
-function blockInternet {
-	INTERFACE="$1"
-	GATEWAY="$2"
-	DURATION="$3"
-
-	timeout "$DURATION" arpspoof -i "$INTERFACE" "$GATEWAY"
-	exit 0
+  timeout "$DURATION" arpspoof -i "$INTERFACE" "$GATEWAY"
+  exit 0
 }
 
+if [ $# -eq 3 ]; then
+  INTERFACE="$1"
+  GATEWAY="$2"
+  DURATION="$3"
 
-if [ $# -eq 3 ]
-then
-	INTERFACE="$1"
-	GATEWAY="$2"
-	DURATION="$3"
-
-	blockInternet "$INTERFACE" "$GATEWAY" "$DURATION"
+  blockInternet "$INTERFACE" "$GATEWAY" "$DURATION"
 else
-	usage
+  usage
 fi

@@ -32,13 +32,50 @@
 }
 
 
+@test "Check aroundtheclock user permissions" {
+  entry1="Cmnd_Alias AROUNDTHECLOCK_CMDS = /usr/local/bin/aroundtheclock"
+  entry2="aroundtheclock ALL=(ALL) NOPASSWD: AROUNDTHECLOCK_CMDS"
+
+  result1=$(grep $entry1 /etc/sudoers)
+  result2=$(grep $entry2 /etc/sudoers)
+
+  [ -z "$result1" ]
+  [ -z "$result2" ]
+}
+
+
 @test "Check aroundtheclock user is assigned no default shell" {
   result=$(cat /etc/passwd | grep -c aroundtheclock:/bin/false)
   [ "$result" -eq 1 ]
 }
 
 
-@test "Check aroundtheclock.service config file exists" {
+@test "Check aroundtheclock executable installed" {
+  run whereis aroundtheclock
+  [ "$status" -eq 0 ]
+}
+
+
+@test "Check aroundtheclock executable permissions" {
+  result=$(getfacl aroundtheclock | grep "owner: root")
+  [ "$result" -eq 1 ]
+
+  result=$(getfacl aroundtheclock | grep "group: root")
+  [ "$result" -eq 1 ]
+
+  result=$(getfacl aroundtheclock | grep "group::---")
+  [ "$result" -eq 1 ]
+
+  result=$(getfacl aroundtheclock | grep "other::---")
+  [ "$result" -eq 1 ]
+
+  # Ensure no setfacl permissions applied (includes final blank line)
+  result=$(getfacl aroundtheclock | wc -l)
+  [ "$result" -eq 7 ]
+}
+
+
+@test "Check aroundtheclock.service config file installed" {
   run ls /lib/systemd/system/aroundtheclock.service
   [ "$status" -eq 0 ]
 }

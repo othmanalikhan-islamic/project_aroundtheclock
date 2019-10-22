@@ -10,9 +10,16 @@ from pathlib import Path
 
 import schedule
 
-import led
 from block import blockInternet
 from prayer import nextFivePrayers, printPrayerTimes, writePrayerTimes
+
+# Try importing a module that uses RPi.GPIO library for Raspberry Pis.
+# This would fail on Windows/Linux platforms (need Raspberry Pi hardware)
+try:
+    import led
+except (ImportError, RuntimeError):
+    led = None
+
 
 PATH_ROOT = Path(__file__, "../../").absolute().resolve()
 
@@ -39,18 +46,22 @@ def main():
     logger.info("Starting project AroundTheClock!")
 
     # Initialising LED
-    pin = led.initialisePi(CONFIG["pin"])
+    if led:
+        pin = led.initialisePi(CONFIG["pin"])
 
     ######################################## SCHEDULING
 
     # Schedule blocking times for prayers otherwise wait on existing jobs.
     while True:
         if schedule.default_scheduler.next_run:
-            blinkSpeed = schedule.default_scheduler.next_run - dt.datetime.now()
-            blinkSpeed = blinkSpeed.total_seconds() / 3600
-            if blinkSpeed < 0.5:
-                blinkSpeed = 0.5
-            led.blinkLED(pin, blinkSpeed)
+
+            if led:
+                blinkSpeed = schedule.default_scheduler.next_run - dt.datetime.now()
+                blinkSpeed = blinkSpeed.total_seconds() / 3600
+                if blinkSpeed < 0.5:
+                    blinkSpeed = 0.5
+                led.blinkLED(pin, blinkSpeed)
+
             schedule.run_pending()
         else:
             FORMAT_SCHEDULE = "%H:%M"

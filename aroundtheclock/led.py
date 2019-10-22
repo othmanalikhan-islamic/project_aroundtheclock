@@ -3,8 +3,9 @@ Responsible for controlling the Raspberry Pi pins connected to an LED.
 """
 
 
-import RPi.GPIO as GPIO
 import time
+
+import RPi.GPIO as GPIO
 
 
 def initialisePi(pin: int):

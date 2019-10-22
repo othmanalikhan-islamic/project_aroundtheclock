@@ -36,8 +36,8 @@
   entry1="Cmnd_Alias AROUNDTHECLOCK_CMDS = /usr/local/bin/aroundtheclock"
   entry2="aroundtheclock ALL=(ALL) NOPASSWD: AROUNDTHECLOCK_CMDS"
 
-  result1=$(grep $entry1 /etc/sudoers)
-  result2=$(grep $entry2 /etc/sudoers)
+  result1=$(grep "$entry1" /etc/sudoers)
+  result2=$(grep "$entry2" /etc/sudoers)
 
   [ -z "$result1" ]
   [ -z "$result2" ]
@@ -57,20 +57,22 @@
 
 
 @test "Check aroundtheclock executable permissions" {
-  result=$(getfacl aroundtheclock | grep "owner: root")
+  location=$(whereis aroundtheclock | cut -d " " -f 2)
+
+  result=$(getfacl "$location" | grep "owner: root")
   [ "$result" -eq 1 ]
 
-  result=$(getfacl aroundtheclock | grep "group: root")
+  result=$(getfacl "$location" | grep "group: root")
   [ "$result" -eq 1 ]
 
-  result=$(getfacl aroundtheclock | grep "group::---")
+  result=$(getfacl "$location" | grep "group::---")
   [ "$result" -eq 1 ]
 
-  result=$(getfacl aroundtheclock | grep "other::---")
+  result=$(getfacl "$location" | grep "other::---")
   [ "$result" -eq 1 ]
 
   # Ensure no setfacl permissions applied (includes final blank line)
-  result=$(getfacl aroundtheclock | wc -l)
+  result=$(getfacl "$location" | wc -l)
   [ "$result" -eq 7 ]
 }
 

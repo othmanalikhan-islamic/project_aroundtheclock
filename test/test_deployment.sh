@@ -59,16 +59,16 @@
 @test "Check aroundtheclock executable permissions" {
   location=$(whereis aroundtheclock | cut -d " " -f 2)
 
-  result=$(getfacl "$location" | grep "owner: root")
+  result=$(getfacl "$location" | grep -c "owner: root" )
   [ "$result" -eq 1 ]
 
-  result=$(getfacl "$location" | grep "group: root")
+  result=$(getfacl "$location" | grep -c "group: root")
   [ "$result" -eq 1 ]
 
-  result=$(getfacl "$location" | grep "group::---")
+  result=$(getfacl "$location" | grep -c "group::---")
   [ "$result" -eq 1 ]
 
-  result=$(getfacl "$location" | grep "other::---")
+  result=$(getfacl "$location" | grep -c "other::---")
   [ "$result" -eq 1 ]
 
   # Ensure no setfacl permissions applied (includes final blank line)

@@ -36,8 +36,8 @@
   entry1="Cmnd_Alias AROUNDTHECLOCK_CMDS = /usr/local/bin/aroundtheclock"
   entry2="aroundtheclock ALL=(ALL) NOPASSWD: AROUNDTHECLOCK_CMDS"
 
-  result1=$(sudo grep "$entry1" /etc/sudoers)
-  result2=$(sudo grep "$entry2" /etc/sudoers)
+  result1=$(grep "$entry1" /etc/sudoers)
+  result2=$(grep "$entry2" /etc/sudoers)
 
   [ -z "$result1" ]
   [ -z "$result2" ]

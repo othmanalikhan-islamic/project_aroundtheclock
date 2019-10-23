@@ -28,6 +28,8 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements/requirements_linux.sh
       script:
+        - sudo cat /etc/sudoers
+        - sudo grep "aroundtheclock" /etc/sudoers
         - sudo bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION

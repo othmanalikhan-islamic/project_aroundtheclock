@@ -36,10 +36,6 @@ def testBlockInternet_startBlocking_executeOSCommands(mocker):
     mockRun.assert_any_call(cmdBlock)
     assert mockRun.call_count == 2
 
-    # Check if code to function to block further execution until arp
-    # poisoning is done has been called
-    assert mockBlock.communicate.call_count == 1
-
 
 def testBlockInternet_noIPRouteOutputFromOS_throwOSError(mocker):
     mockIPRoute = mocker.Mock(name="cmd_route")

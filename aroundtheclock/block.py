@@ -16,19 +16,19 @@ def oneTimeJob(func):
     Decorator that causes the given scheduled function to run only once.
     As a bonus, it also logs the subsequent job to be ran.
 
-    NOTE: This decorator suppresses any results returned by the given function.
+    NOTE: This decorator suppresses any returned results by the given function.
 
     :param func: function, the function to be wrapped.
     :return: function, the wrapped function.
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        func(*args, **kwargs)   # Outside try-except to allow exception bubbling
         try:
             logging.info("Next job at {}.".format(schedule.jobs[1].next_run))
         except IndexError:
             logging.info("No next job scheduled!")
         finally:
-            func(*args, **kwargs)
             return schedule.CancelJob
     return wrapper
 
@@ -65,6 +65,5 @@ def blockInternet(duration):
     seconds = int(duration * 60)
     cmdBlock = "sudo aroundtheclock {} {} {}".format(INTERFACE, GATEWAY, seconds)
     logging.info("Ran the following command to block: '{}'".format(cmdBlock))
-    proc = subprocess.run(shlex.split(cmdBlock))
-    proc.communicate()  # Block subsequent execution until finished
+    subprocess.run(shlex.split(cmdBlock))
     logging.info("Block time over, unblocking internet now!")

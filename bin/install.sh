@@ -58,6 +58,8 @@ echo -e "\n>>> ENABLING AROUNDTHECLOCK DAEMON..."
 sudo systemctl enable aroundtheclock.service
 sudo systemctl start aroundtheclock.service
 
-echo -e "\n>>> DONE INSTALLING! CHECKING IF AROUNDTHECLOCK IS RUNNING..."
-sleep 3
+echo -e "\n>>> DONE INSTALLING!"
+
+echo -e "\n>>> CHECKING IF AROUNDTHECLOCK IS RUNNING..."
+sleep 3   # Ensuring that the service has enough time to initialise
 sudo systemctl status aroundtheclock.service

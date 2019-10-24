@@ -17,6 +17,8 @@
     "output": "output",
     "logging": "config/logging.ini",
     "prayer": "output/prayer.json"
-  }
+  },
+
+  "pin": 18
 }
 

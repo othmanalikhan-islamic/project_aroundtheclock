@@ -6,6 +6,7 @@ import pytest
 
 import setup_paths
 setup_paths.setupPaths()
+setup_paths.importFakeRPiModule()
 import main as main
 
 ######################################## HELPER FUNCTIONS
@@ -66,7 +67,7 @@ def testMain_createOutputDirectory_OSInvoked(mocker):
 
 def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     def branchIfElse(*args, **kwargs):
-        mockSchedule.default_scheduler.next_run = True
+        mockSchedule.default_scheduler.next_run = dt.datetime(2019, 1, 27, 12)
 
     times = ["05:05", "11:52", "14:56", "17:17", "18:47"]
 
@@ -74,9 +75,10 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     _ = mocker.patch("logging.getLogger")
     _ = mocker.patch("main.json.dump")
     _ = mocker.patch("main.Path.mkdir")
+    mockLED = mocker.patch("main.led")
 
     mockSchedule = mocker.patch("main.schedule")
-    mockSchedule.default_scheduler.next_run = False
+    mockSchedule.default_scheduler.next_run = None
     mockSchedule.run_pending.side_effect = EndOfTestException
     mockSchedule.every.return_value.day.at.return_value.do.side_effect = branchIfElse
 
@@ -90,6 +92,9 @@ def testMain_scheduleNewPrayerTimes_scheduleAndWait(mocker):
     [mockSchedule.every.return_value.day.at.assert_any_call(t) for t in times]
     assert mockSchedule.every.return_value.day.at.return_value.do.call_count == 5
 
-    # Check if waiting
+    # Check if LED blinked
+    assert mockLED.blinkLED.call_count == 1
+
+    # Check if scheduled jobs attempted to be executed
     assert mockSchedule.run_pending.call_count == 1
 

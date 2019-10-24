@@ -28,7 +28,7 @@ jobs:
         - sudo ./bin/install.sh
         - ./test/requirements/requirements_linux.sh
       script:
-        - bats ./test/test_deployment.sh
+        - sudo bats ./test/test_deployment.sh
 
 ### EXTRA CONFIGURATION
 

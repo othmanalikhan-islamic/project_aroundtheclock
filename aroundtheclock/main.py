@@ -47,6 +47,7 @@ def main():
 
     # Initialising LED
     if led:
+        logging.info("Initialising Raspberry Pi pin: {}".format(CONFIG["pin"]))
         pin = led.initialisePi(CONFIG["pin"])
 
     ######################################## SCHEDULING

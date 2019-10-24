@@ -27,7 +27,13 @@ source ./virtual/bin/activate
 yes | pip install -r requirements_python.txt
 
 echo -e "\n>>> CREATING AN AROUNDTHECLOCK DAEMON USER"
-sudo useradd -r aroundtheclock -s /bin/false
+if [ "$(getent group gpio)" ]; then
+  # 'gpio' group is needed to access GPIO pins as non-root
+  sudo useradd -r aroundtheclock -g gpio -s /bin/false
+else
+  # Otherwise create a user but no access to pins for LED
+  sudo useradd -r aroundtheclock -s /bin/false
+fi
 
 echo -e "\n>>> INSTALLING AROUNDTHECLOCK AS A DAEMON..."
 PATH_SRC=./config/aroundtheclock.service
